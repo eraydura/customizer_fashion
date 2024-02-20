@@ -29,8 +29,6 @@ export function Shoe({ onModelLoad, ...props }) {
         <mesh
           material-metalness={1.0}
           material-roughness={1.0}
-          normalMap={useTexture("./textures/fabric.png")}
-          aoMap={useTexture("./textures/fabric_ao.png")}
           geometry={nodes.shoe.geometry}
           material={materials.laces}
           material-color={props.customColors.stripes}
@@ -38,8 +36,6 @@ export function Shoe({ onModelLoad, ...props }) {
         <mesh
           material-metalness={1.0}
           material-roughness={1.0}
-          normalMap={useTexture("./textures/fabric.png")}
-          aoMap={useTexture("./textures/fabric_ao.png")}
           geometry={nodes.shoe_2.geometry}
           material={materials.caps}
           material-color={props.customColors.soul}
@@ -47,8 +43,6 @@ export function Shoe({ onModelLoad, ...props }) {
         <mesh
           material-metalness={1.0}
           material-roughness={1.0}
-          normalMap={useTexture("./textures/fabric.png")}
-          aoMap={useTexture("./textures/fabric_ao.png")}
           geometry={nodes.shoe_3.geometry}
           material={materials.inner}
           material-color={props.customColors.soul}
@@ -56,8 +50,6 @@ export function Shoe({ onModelLoad, ...props }) {
         <mesh
           material-metalness={1.0}
           material-roughness={1.0}
-          normalMap={useTexture("./textures/fabric.png")}
-          aoMap={useTexture("./textures/fabric_ao.png")}
           geometry={nodes.shoe_4.geometry}
           material={materials.sole}
           material-color={props.customColors.soul}
@@ -65,8 +57,6 @@ export function Shoe({ onModelLoad, ...props }) {
         <mesh
           material-metalness={1.0}
           material-roughness={1.0}
-          normalMap={useTexture("./textures/fabric.png")}
-          aoMap={useTexture("./textures/fabric_ao.png")}
           geometry={nodes.shoe_5.geometry}
           material={materials.stripes}
           material-color={props.customColors.stripes}
@@ -74,8 +64,6 @@ export function Shoe({ onModelLoad, ...props }) {
         <mesh
           material-metalness={1.0}
           material-roughness={1.0}
-          normalMap={useTexture("./textures/fabric.png")}
-          aoMap={useTexture("./textures/fabric_ao.png")}
           geometry={nodes.shoe_6.geometry}
           material={materials.band}
           material-color={props.customColors.stripes}
@@ -83,8 +71,6 @@ export function Shoe({ onModelLoad, ...props }) {
         <mesh
           material-metalness={1.0}
           material-roughness={1.0}
-          normalMap={useTexture("./textures/fabric.png")}
-          aoMap={useTexture("./textures/fabric_ao.png")}
           geometry={nodes.shoe_7.geometry}
           material={materials.patch}
           material-color={props.customColors.soul}
@@ -92,8 +78,6 @@ export function Shoe({ onModelLoad, ...props }) {
         <mesh
           material-metalness={1.0}
           material-roughness={1.0}
-          normalMap={useTexture("./textures/fabric.png")}
-          aoMap={useTexture("./textures/fabric_ao.png")}
           geometry={nodes.shoe_1.geometry}
           material-color={props.customColors.mesh}
         >
@@ -107,6 +91,7 @@ export function Shoe({ onModelLoad, ...props }) {
 
                <meshStandardMaterial
                 map={useTexture(props.customColors.texture)}
+                normalMap={useTexture("./textures/fabric.png")}
                 toneMapped={true}
                 polygonOffset
                 polygonOffsetFactor={-1} // The mesh should take precedence over the original
@@ -192,6 +177,17 @@ function Shoes() {
     justifyContent: 'flex-start',
     alignItems: 'flex-start',
   };
+  const dropdownStyle2 = {
+    position: 'absolute',
+    top: '3%',
+    left: '25%',
+    display: 'flex',
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
+    width: '50%', // Adjust the width as needed
+    margin: '0 auto', // This will center the container horizontally
+  };
 
   // Calculate the gap dynamically based on the number of children elements
   const calculateDynamicGap = (containerHeight, numChildren) => {
@@ -204,6 +200,7 @@ function Shoes() {
   const numChildren = 3; // Example number of children
   const dynamicGap = calculateDynamicGap(containerHeight, numChildren);
   dropdownStyle.gap = dynamicGap + 'px';
+  dropdownStyle2.gap= dynamicGap + 'px';
 
 
   return (
@@ -227,20 +224,35 @@ function Shoes() {
         />
       </Canvas>
       ({modelLoaded ? <div>
-      <div
+        ({isMobile ? <div>
+          <input
+          type="color"
+          style={{ position: 'absolute',top: '10%',left: '20px', width: '50px', height: '50px'}}
+          value={partSelected[selectedIndex] === 'mesh' ? meshColor : partSelected[selectedIndex] === 'stripes' ? stripeColor : soulColor}
+          onChange={(e) => handleColorChange(e.target.value)}
+        />
+        <div style={dropdownStyle2}>
+        {partSelected.map((part, index) => (
+          <button style={{   backgroundColor:"transparent",border:0 }} key={index} onClick={() => handlePartChange(index)}>
+            <img src={part === 'mesh' ? meshs : part === 'stripes' ? stripeimage : souls} alt={part} style={{ width: '40px', height: '40px' }} />
+          </button>
+        ))}
+        </div>
+      </div>: <div
         style={dropdownStyle}
       >
         <input
           type="color"
+          style={{ width:  '100px', height:  '100px'}}
           value={partSelected[selectedIndex] === 'mesh' ? meshColor : partSelected[selectedIndex] === 'stripes' ? stripeColor : soulColor}
           onChange={(e) => handleColorChange(e.target.value)}
         />
         {partSelected.map((part, index) => (
-          <button style={{borderRadius:360,}} key={index} onClick={() => handlePartChange(index)}>
+          <button style={{    borderRadius:360 }} key={index} onClick={() => handlePartChange(index)}>
             <img src={part === 'mesh' ? meshs : part === 'stripes' ? stripeimage : souls} alt={part} style={{ width: '80px', height: '80px' }} />
           </button>
         ))}
-      </div>
+      </div> })
       <div
         style={{
           position: 'absolute',
@@ -248,13 +260,13 @@ function Shoes() {
           left: isMobile?'70%':'90%',
         }}
       >
-        <button style={{borderRadius:360,width: '100px', height: '100px'}}  onClick={galleryOpen}>
-          <img src={icon} alt="gallery" style={{ width: '50px', height: '50px' }} />
+        <button style={{ borderRadius:360,width: !isMobile? '100px'  :'60px', height: !isMobile?'100px':'60px'}}  onClick={galleryOpen}>
+          <img src={icon} alt="gallery" style={{ width: !isMobile? '50px' : '35px', height: !isMobile? '50px' :'35px'}} />
         </button>
       </div>
 
-        <div style={{display:display,     position: 'absolute',      top: '90%',
-          left: '10%', flexDirection: 'row',gap: '150px'}}>
+      <div style={{display:display,     position: 'absolute',      top: isMobile? '40%':'90%',
+          left: '10%', flexDirection: isMobile?'column':'row',gap: isMobile?'5px':'150px'}}>
             <div>
               <label htmlFor="posX">Position X</label>
               <input

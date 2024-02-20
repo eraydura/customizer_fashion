@@ -130,11 +130,21 @@ function Mug() {
       <div
         style={dropdownStyle}
       >
-        <input
-          type="color"
-          value={meshColor }
-          onChange={(e) => handleColorChange(e.target.value)}
-        />
+
+        {isMobile ? (
+          <input
+            type="color"
+            style={{ position: 'absolute', top: '10%', left: '20px', width: '50px', height: '50px' }}
+            value={meshColor}
+            onChange={(e) => handleColorChange(e.target.value)}
+          />
+        ) : (
+          <input
+            type="color"
+            value={meshColor}
+            onChange={(e) => handleColorChange(e.target.value)}
+          />
+        )}
       </div>
       <div
         style={{
@@ -143,13 +153,13 @@ function Mug() {
           left: isMobile?'70%':'90%',
         }}
       >
-        <button style={{borderRadius:360,width: '100px', height: '100px'}}  onClick={galleryOpen}>
-          <img src={icon} alt="gallery" style={{ width: '50px', height: '50px' }} />
+        <button style={{borderRadius:360,width: isMobile? '50px':'100px', height: isMobile? '50px':'100px'}}  onClick={galleryOpen}>
+          <img src={icon} alt="gallery" style={{ width: isMobile? '25px':'50px', height: isMobile? '25px':'50px' }} />
         </button>
       </div>
 
-        <div style={{display:display,     position: 'absolute',      top: '90%',
-          left: '10%', flexDirection: 'row',gap: '150px'}}>
+      <div style={{display:display,     position: 'absolute',      top: isMobile? '40%':'90%',
+          left: '10%', flexDirection: isMobile?'column':'row',gap: isMobile?'5px':'150px'}}>
             <div>
               <label htmlFor="posX">Position X</label>
               <input
