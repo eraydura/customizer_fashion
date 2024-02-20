@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Canvas } from '@react-three/fiber';
+import { Canvas,useLoader } from '@react-three/fiber';
 import {
   Environment,
   OrbitControls,
@@ -12,6 +12,7 @@ import body from '../assets/body.png';
 import neck from '../assets/neck.png';
 import icon from '../assets/image.png';
 import { degToRad } from "three/src/math/MathUtils.js";
+import { TextureLoader } from 'three/src/loaders/TextureLoader'
 
 export function TshirtMesh(props) {
   const { nodes, materials } = useGLTF("/models/Tshirt.glb");
@@ -19,7 +20,7 @@ export function TshirtMesh(props) {
   return (
     <group {...props} dispose={null} position={[0, -4, 0]}  scale={3}>
       <mesh   material-metalness={0.5}
-           material-roughness={0.5} geometry={nodes.tshirt5Pattern2D_2210268.geometry} material={materials['Material.005']} position={[0, 0.001, 0]} material-color={props.customColors.mesh} >
+           material-roughness={0.5} geometry={nodes.tshirt5Pattern2D_2210268.geometry} material={materials['Fabric']} position={[0, 0.001, 0]} material-color={props.customColors.mesh} >
       <Decal
               // debug // Makes "bounding box" of the decal visible
               position={props.customColors.pos} // Position of the decal
@@ -29,6 +30,7 @@ export function TshirtMesh(props) {
 
                <meshStandardMaterial
                 map={useTexture(props.customColors.texture)}
+                normalMap={useLoader(TextureLoader,"./textures/fabric.png")}
                 toneMapped={true}
                 polygonOffset
                 polygonOffsetFactor={-1} // The mesh should take precedence over the original
@@ -37,12 +39,9 @@ export function TshirtMesh(props) {
 
             </Decal> 
       </mesh>
-      <mesh   material-metalness={0.5}
-           material-roughness={0.5} geometry={nodes.tshirt5Pattern2D_2210268001.geometry} material={materials['Material.004']} position={[0, 0.001, 0]} material-color={props.customColors.arm}/>
-      <mesh   material-metalness={0.5}
-           material-roughness={0.5} geometry={nodes.tshirt5Pattern2D_2210268002.geometry} material={materials['Material.003']} position={[0, 0.001, 0]} material-color={props.customColors.arm}/>
-      <mesh   material-metalness={0.5}
-           material-roughness={0.5} geometry={nodes.tshirt5Pattern2D_2210268003.geometry} material={materials['Material.002']} position={[0, 0.001, 0]} material-color={props.customColors.neck}/>
+      <mesh   material-metalness={0.5} material-roughness={0.5} geometry={nodes.tshirt5Pattern2D_2210268001.geometry} material={materials['Fabric1']} position={[0, 0.001, 0]} material-color={props.customColors.arm}></mesh>
+      <mesh   material-metalness={0.5} material-roughness={0.5} geometry={nodes.tshirt5Pattern2D_2210268002.geometry} material={materials['Fabric2']} position={[0, 0.001, 0]} material-color={props.customColors.arm}></mesh>
+      <mesh   material-metalness={0.5} material-roughness={0.5} geometry={nodes.tshirt5Pattern2D_2210268003.geometry} material={materials['Fabric3']} position={[0, 0.001, 0]} material-color={props.customColors.neck}></mesh>
     </group>
   );
 }
@@ -193,7 +192,7 @@ function Tshirt() {
               <input
                 type="range"
                 id="posY"
-                min={-3}
+                min={1}
                 max={3}
                 step={0.01}
                 value={position[1]}

@@ -18,14 +18,10 @@ export function DDress(props) {
   return (
 
     <group {...props} dispose={null}>
-      <group position={[0,-1.5,0]} rotation={[-Math.PI / 2, 0, 0]} scale={0.015}>
-        <mesh           
-           material-metalness={0.5}
-           material-roughness={0.5} 
-           geometry={nodes.Object_3.geometry} 
-           material={materials['Lambskin_Leather_FCL2PSL001_FRONT_3983.001']} 
-           material-color={props.customColors.down}>
-                    <Decal
+      <group position={[0,-3,0]} scale={0.03}>
+        <mesh    material-metalness={0.5}
+           material-roughness={0.5}  geometry={nodes.dress_Stretch_Denim_FCL1PSD003_FRONT_4181_0.geometry}  material={materials.Cotton_Oxford_FCL1PSC011_FRONT_4175001} material-color={props.customColors.down} >
+        <Decal
               
               position={props.customColors.pos2} // Position of the decal
               rotation={props.customColors.rotation2} // Rotation of the decal (can be a vector or a degree in radians)
@@ -34,6 +30,8 @@ export function DDress(props) {
 
                <meshStandardMaterial
                 map={useTexture(props.customColors.downtexture)}
+                normalMap={useTexture("./textures/fabric.png")}
+                aoMap={useTexture("./textures/fabric_ao.png")}
                 toneMapped={true}
                 polygonOffset
                 polygonOffsetFactor={-1} // The mesh should take precedence over the original
@@ -42,11 +40,8 @@ export function DDress(props) {
 
             </Decal>
         </mesh>
-        <mesh           
-         material-metalness={0.5}
-         material-roughness={0.5} 
-         geometry={nodes.Object_3001.geometry} 
-         material-color={props.customColors.up}>
+        <mesh            material-metalness={0.5}
+           material-roughness={0.5}  geometry={nodes.dress_Cotton_Oxford_FCL1PSC011_FRONT_4174_0.geometry} material={materials.Cotton_Oxford_FCL1PSC011_FRONT_4174} material-color={props.customColors.up} >
         <Decal
               
               position={props.customColors.pos} // Position of the decal
@@ -56,6 +51,8 @@ export function DDress(props) {
 
                <meshStandardMaterial
                 map={useTexture(props.customColors.uptexture)}
+                normalMap={useTexture("./textures/fabric.png")}
+                aoMap={useTexture("./textures/fabric_ao.png")}
                 toneMapped={true}
                 polygonOffset
                 polygonOffsetFactor={-1} // The mesh should take precedence over the original
@@ -75,9 +72,9 @@ function Dress() {
   const [display, setDisplay] = useState('none');
   const [uptexture, setUpTexture] = useState("./textures/wawa.png");
   const [downtexture, setDownTexture] = useState("./textures/wawa.png");
-  const [position, setPosition] = useState([0, 0, 0]);
+  const [position, setPosition] = useState([0, 90, 0]);
   const [rotation, setRotation] = useState([0, 0, 0]);
-  const [position2, setPosition2] = useState([0, 0, 0]);
+  const [position2, setPosition2] = useState([0, 90, 0]);
   const [rotation2, setRotation2] = useState([0, 0, 0]);
   const [scale2, setScale2] = useState([0, 0, 0]);
   const [scale, setScale] = useState([0, 0, 0]);
@@ -206,13 +203,13 @@ function Dress() {
 
         <div style={{display:display,     position: 'absolute',      top: '90%',
           left: '10%', flexDirection: 'row',gap: '150px'}}>
-            <div>
+ <div>
               <label htmlFor="posX">Position X</label>
               <input
                 type="range"
                 id="posX"
-                min={-3}
-                max={3}
+                min={-10}
+                max={10}
                 step={0.01}
                 value={position[0]}
                 onChange={handleSliderChange((value) =>
@@ -225,8 +222,8 @@ function Dress() {
               <input
                 type="range"
                 id="posY"
-                min={-3}
-                max={3}
+                min={90}
+                max={150}
                 step={0.01}
                 value={position[1]}
                 onChange={handleSliderChange((value) =>

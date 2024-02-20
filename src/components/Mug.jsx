@@ -16,39 +16,15 @@ export function Shoe(props) {
   return (
     <group  {...props} dispose={null}>
       <group position={[0, -0.5, 0]} scale={0.3}>
-      <mesh
-      material-metalness={0.5}
-      material-roughness={0.5}
-        geometry={nodes.Arc001_1.geometry}
-        material={materials["01___Default-2"]}
-        material-color={props.customColors.mesh}
-      />
-      <mesh
-      material-metalness={0.5}
-      material-roughness={0.5}
-        geometry={nodes.Arc001_1_1.geometry}
-        material={materials["02___Default-2"]}
-        material-color={props.customColors.mesh}
-      />
-      <mesh
-      material-metalness={0.5}
-      material-roughness={0.5}
-        geometry={nodes.Arc001_1_2.geometry}
-        material={materials["02___Default"]}
-        material-color={props.customColors.mesh}
-      />
-      <mesh
-      material-metalness={0.5}
-      material-roughness={0.5}
-        geometry={nodes.Arc001_1_3.geometry}
-        material={materials["01___Default"]}
-        material-color={props.customColors.mesh}
-      />
-      <mesh           
-           material-metalness={1.0}
-           material-roughness={1.0}
-           material-color={props.customColors.mesh} 
-           geometry={nodes.Arc001_1_4.geometry}>
+        <mesh      material-metalness={0.5}
+      material-roughness={0.5} geometry={nodes.Arc001_1002.geometry} material={materials['01___Default-2.002']} material-color={props.customColors.mesh} />
+        <mesh      material-metalness={0.5}
+      material-roughness={0.5} geometry={nodes.Arc001_1002_1.geometry} material={materials['02___Default-2.002']} material-color={props.customColors.mesh} />
+        <mesh      material-metalness={0.5}
+      material-roughness={0.5} geometry={nodes.Arc001_1002_2.geometry} material={materials['02___Default.002']} material-color={props.customColors.mesh} />
+        <mesh      material-metalness={0.5}
+      material-roughness={0.5} geometry={nodes.Arc001_1002_3.geometry} material={materials['01___Default.002']} material-color={props.customColors.mesh} />
+<mesh geometry={nodes.Arc001_1002_4.geometry} material={materials['printable.002']}>
         
         <meshBasicMaterial transparent opacity={0} />
 
