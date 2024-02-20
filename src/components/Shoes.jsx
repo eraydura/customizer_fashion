@@ -233,7 +233,17 @@ function Shoes() {
         />
         <div style={dropdownStyle2}>
         {partSelected.map((part, index) => (
-          <button style={{   backgroundColor:"transparent",border:0 }} key={index} onClick={() => handlePartChange(index)}>
+                    <button 
+                    style={{ 
+                      borderRadius: 360,
+                      border:0,
+                      width: '60px', 
+                      height: '60px',
+                      backgroundColor: part === partSelected[selectedIndex] ? "green" : "transparent" // Apply green border if selected, otherwise no border
+                    }} 
+                    key={index} 
+                    onClick={() => handlePartChange(index)}
+                  >
             <img src={part === 'mesh' ? meshs : part === 'stripes' ? stripeimage : souls} alt={part} style={{ width: '40px', height: '40px' }} />
           </button>
         ))}
@@ -248,7 +258,7 @@ function Shoes() {
           onChange={(e) => handleColorChange(e.target.value)}
         />
         {partSelected.map((part, index) => (
-          <button style={{    borderRadius:360 }} key={index} onClick={() => handlePartChange(index)}>
+          <button style={{ backgroundColor: part === partSelected[selectedIndex] ? "green" :"white",border:0,    borderRadius:360 }} key={index} onClick={() => handlePartChange(index)}>
             <img src={part === 'mesh' ? meshs : part === 'stripes' ? stripeimage : souls} alt={part} style={{ width: '80px', height: '80px' }} />
           </button>
         ))}
