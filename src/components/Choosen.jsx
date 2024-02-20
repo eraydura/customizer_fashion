@@ -100,13 +100,13 @@ export default function Choosen() {
           )}
         </div>
     </div>
-    <div style={ {top:"70%", position: "absolute",  display: "flex", alignItems: "center" }}>
+    <div style={ {top:"85%", position: "absolute",  display: "flex", alignItems: "center" }}>
       <button onClick={handleOkay} style={{   backgroundColor: 'red',color: 'white',padding: '10px 20px',borderRadius: '5px',
           cursor: 'pointer',fontSize: '16px',fontWeight: 'bold',textDecoration: 'none',   outline: 0, border: 0,   }}>
             SELECT
       </button>
     </div>
-    <div style={isMobile ? { position: "absolute", top:'75%', marginTop: "1.5rem", display: "flex", alignItems: "center" } : { marginTop: "1rem", display: "flex", alignItems: "center" }}>
+    <div style={isMobile ? { position: "absolute", top:'85%', marginTop: "1.5rem", display: "flex", alignItems: "center" } : { marginTop: "1rem", display: "flex", alignItems: "center" }}>
       {[...Array(modelCount)].map((_, index) => (
         <div
           key={index}
