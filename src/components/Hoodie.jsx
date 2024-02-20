@@ -12,13 +12,19 @@ import meshs from '../assets/1.png';
 import stripeimage from '../assets/2.png';
 import icon from '../assets/image.png';
 import { degToRad } from "three/src/math/MathUtils.js";
+import {isMobile} from 'react-device-detect';
 
-export function HoodieMesh(props) {
-  const { nodes, materials } = useGLTF("/models/hoodie.glb");
-
+export function HoodieMesh({ onModelLoad, ...props }) {
+  const { nodes, materials ,scene} = useGLTF("/models/hoodie.glb");
+  // Notify parent component when model is loaded
+  React.useEffect(() => {
+    if (scene) {
+      onModelLoad();
+    }
+  }, [scene, onModelLoad]);
   return (
     <group {...props} dispose={null}>
-    <group position={[0,-4,0]} scale={0.003}>
+    <group position={isMobile? [0,-1.8,0]:[0,-4,0]} scale={isMobile? 0.0015: 0.003}>
       <group scale={10}>
         <mesh geometry={nodes.Hoodie_FABRIC_3_FRONT_1850_0.geometry} material={materials.FABRIC_3_FRONT_1850} material-color={props.customColors.mesh} >
         <Decal
@@ -57,6 +63,12 @@ function Hoodie() {
   const [scale, setScale] = useState([0, 0, 0]);
   const partSelected = ['mesh', 'stripes', 'soul'];
   const [selectedIndex, setSelectedIndex] = useState(0);
+  const [modelLoaded, setModelLoaded] = useState(false);
+
+  const handleModelLoad = () => {
+    setModelLoaded(true);
+    console.log(modelLoaded);
+  };
 
   const handlePartChange = (index) => {
     setSelectedIndex(index);
@@ -104,7 +116,7 @@ function Hoodie() {
   const BUTTON_HEIGHT = 20;
   const dropdownStyle = {
     position: 'absolute',
-    top: '20px',
+    top: '10%',
     left: '20px',
     display: 'flex',
     flexDirection: 'column',
@@ -126,13 +138,14 @@ function Hoodie() {
 
 
   return (
-    <div style={{ width: '100vw', height: '100vh', position: 'relative' }}>
+    <div style={{overflow:"hidden", width: '100vw', height: '100vh', position: 'relative',backgroundColor:'black' }}>
       <Canvas shadows camera={{ position: [3, 3, 3], fov: 30 }}>
         <color attach="background" args={['#ececec']} />
         <OrbitControls />
         <Environment preset="sunset" background blur={4} />
         <ambientLight />
         <HoodieMesh
+        onModelLoad={handleModelLoad}
           customColors={{
             mesh: meshColor,
             stripes: stripeColor,
@@ -144,6 +157,7 @@ function Hoodie() {
           }}
         />
       </Canvas>
+      ({modelLoaded ? <div>
       <div
         style={dropdownStyle}
       >
@@ -162,8 +176,7 @@ function Hoodie() {
         style={{
           position: 'absolute',
           top: '10%',
-          left: '90%',
-          transform: 'translate(-50%, -50%)',
+          left: isMobile?'70%':'90%',
         }}
       >
         <button style={{borderRadius:360,width: '100px', height: '100px'}}  onClick={galleryOpen}>
@@ -230,6 +243,9 @@ function Hoodie() {
               />
             </div>
         </div>
+        </div> : <div style={{ width: "100%", height: "100%" }}>
+  <div style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', color: 'white', padding: '10px 20px', borderRadius: '5px' }}><h1>Loading...</h1></div>
+</div> })
     </div>
   );
 }

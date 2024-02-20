@@ -9,10 +9,16 @@ import {
 } from '@react-three/drei';
 import icon from '../assets/image.png';
 import { degToRad } from "three/src/math/MathUtils.js";
+import {isMobile} from 'react-device-detect';
 
-export function Shoe(props) {
-  const { nodes, materials } = useGLTF("/models/mug.glb");
-
+export function Shoe({ onModelLoad, ...props }) {
+  const { nodes, materials,scene } = useGLTF("/models/mug.glb");
+  // Notify parent component when model is loaded
+  React.useEffect(() => {
+    if (scene) {
+      onModelLoad();
+    }
+  }, [scene, onModelLoad]);
   return (
     <group  {...props} dispose={null}>
       <group position={[0, -0.5, 0]} scale={0.3}>
@@ -58,6 +64,12 @@ function Mug() {
   const [position, setPosition] = useState([0, 1, 0]);
   const [rotation, setRotation] = useState([0, 0, 0]);
   const [scale, setScale] = useState([0, 0, 0]);
+  const [modelLoaded, setModelLoaded] = useState(false);
+
+  const handleModelLoad = () => {
+    setModelLoaded(true);
+    console.log(modelLoaded);
+  };
 
   const galleryOpen = () => {
     const input = document.createElement('input');
@@ -88,7 +100,7 @@ function Mug() {
 
   const dropdownStyle = {
     position: 'absolute',
-    top: '20px',
+    top: '10%',
     left: '20px',
     display: 'flex',
     flexDirection: 'column',
@@ -97,13 +109,14 @@ function Mug() {
   };
 
   return (
-    <div style={{ width: '100vw', height: '100vh', position: 'relative' }}>
+    <div style={{overflow:"hidden", width: '100vw', height: '100vh', position: 'relative',backgroundColor:'black' }}>
       <Canvas shadows camera={{ position: [3, 3, 3], fov: 30 }}>
         <color attach="background" args={['#ececec']} />
         <OrbitControls />
         <Environment preset="sunset" background blur={4} />
         <ambientLight />
         <Shoe
+        onModelLoad={handleModelLoad}
           customColors={{
             mesh: meshColor,
             texture: texture,
@@ -113,6 +126,7 @@ function Mug() {
           }}
         />
       </Canvas>
+      ({modelLoaded ? <div>
       <div
         style={dropdownStyle}
       >
@@ -126,8 +140,7 @@ function Mug() {
         style={{
           position: 'absolute',
           top: '10%',
-          left: '90%',
-          transform: 'translate(-50%, -50%)',
+          left: isMobile?'70%':'90%',
         }}
       >
         <button style={{borderRadius:360,width: '100px', height: '100px'}}  onClick={galleryOpen}>
@@ -194,6 +207,9 @@ function Mug() {
               />
             </div>
         </div>
+        </div> : <div style={{ width: "100%", height: "100%" }}>
+  <div style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', color: 'white', padding: '10px 20px', borderRadius: '5px' }}><h1>Loading...</h1></div>
+</div> })
     </div>
   );
 }

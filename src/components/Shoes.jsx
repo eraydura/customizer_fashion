@@ -12,13 +12,20 @@ import meshs from '../assets/mesh.png';
 import stripeimage from '../assets/stripes.png';
 import icon from '../assets/image.png';
 import { degToRad } from "three/src/math/MathUtils.js";
+import {isMobile} from 'react-device-detect';
 
-export function Shoe(props) {
-  const { nodes, materials } = useGLTF("/models/shoes/shoe.gltf");
+export function Shoe({ onModelLoad, ...props }) {
+  const { nodes, materials,scene } = useGLTF("/models/shoes/shoe.gltf");
+    // Notify parent component when model is loaded
+    React.useEffect(() => {
+      if (scene) {
+        onModelLoad();
+      }
+    }, [scene, onModelLoad]);
 
   return (
     <group {...props} dispose={null}>
-      <group position={[0, 0, 0]} rotation={[-Math.PI / 2, 0, 0]} scale={1}>
+      <group position={[0, 0, 0]} rotation={[-Math.PI / 2, 0, 0]} scale={isMobile?0.7:1}>
         <mesh
           material-metalness={1.0}
           material-roughness={1.0}
@@ -125,6 +132,12 @@ function Shoes() {
   const [scale, setScale] = useState([0, 0, 0]);
   const partSelected = ['mesh', 'stripes', 'soul'];
   const [selectedIndex, setSelectedIndex] = useState(0);
+  const [modelLoaded, setModelLoaded] = useState(false);
+
+  const handleModelLoad = () => {
+    setModelLoaded(true);
+    console.log(modelLoaded);
+  };
 
   const handlePartChange = (index) => {
     setSelectedIndex(index);
@@ -172,7 +185,7 @@ function Shoes() {
   const BUTTON_HEIGHT = 20;
   const dropdownStyle = {
     position: 'absolute',
-    top: '20px',
+    top: '10%',
     left: '20px',
     display: 'flex',
     flexDirection: 'column',
@@ -194,13 +207,14 @@ function Shoes() {
 
 
   return (
-    <div style={{ width: '100vw', height: '100vh', position: 'relative' }}>
+    <div style={{overflow:"hidden", width: '100vw', height: '100vh', position: 'relative',backgroundColor:'black' }}>
       <Canvas shadows camera={{ position: [3, 3, 3], fov: 30 }}>
         <color attach="background" args={['#ececec']} />
         <OrbitControls />
         <Environment preset="sunset" background blur={4} />
         <ambientLight />
         <Shoe
+        onModelLoad={handleModelLoad}
           customColors={{
             mesh: meshColor,
             stripes: stripeColor,
@@ -212,6 +226,7 @@ function Shoes() {
           }}
         />
       </Canvas>
+      ({modelLoaded ? <div>
       <div
         style={dropdownStyle}
       >
@@ -230,8 +245,7 @@ function Shoes() {
         style={{
           position: 'absolute',
           top: '10%',
-          left: '90%',
-          transform: 'translate(-50%, -50%)',
+          left: isMobile?'70%':'90%',
         }}
       >
         <button style={{borderRadius:360,width: '100px', height: '100px'}}  onClick={galleryOpen}>
@@ -298,6 +312,9 @@ function Shoes() {
               />
             </div>
         </div>
+        </div> : <div style={{ width: "100%", height: "100%" }}>
+  <div style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', color: 'white', padding: '10px 20px', borderRadius: '5px' }}><h1>Loading...</h1></div>
+</div> })
     </div>
   );
 }

@@ -13,12 +13,19 @@ import neck from '../assets/neck.png';
 import icon from '../assets/image.png';
 import { degToRad } from "three/src/math/MathUtils.js";
 import { TextureLoader } from 'three/src/loaders/TextureLoader'
+import {isMobile} from 'react-device-detect';
 
-export function TshirtMesh(props) {
-  const { nodes, materials } = useGLTF("/models/Tshirt.glb");
+export function TshirtMesh({ onModelLoad, ...props }) {
+  const { nodes, materials,scene } = useGLTF("/models/Tshirt.glb");
+    // Notify parent component when model is loaded
+    React.useEffect(() => {
+      if (scene) {
+        onModelLoad();
+      }
+    }, [scene, onModelLoad]);
 
   return (
-    <group {...props} dispose={null} position={[0, -4, 0]}  scale={3}>
+    <group {...props} dispose={null} position={isMobile?[0, -2.5, 0]:[0, -4, 0]}  scale={isMobile?2:3}>
       <mesh   material-metalness={0.5}
            material-roughness={0.5} geometry={nodes.tshirt5Pattern2D_2210268.geometry} material={materials['Fabric']} position={[0, 0.001, 0]} material-color={props.customColors.mesh} >
       <Decal
@@ -57,6 +64,12 @@ function Tshirt() {
   const [scale, setScale] = useState([0, 0, 0]);
   const partSelected = ['mesh', 'arm', 'neck'];
   const [selectedIndex, setSelectedIndex] = useState(0);
+  const [modelLoaded, setModelLoaded] = useState(false);
+
+  const handleModelLoad = () => {
+    setModelLoaded(true);
+    console.log(modelLoaded);
+  };
 
   const handlePartChange = (index) => {
     setSelectedIndex(index);
@@ -104,7 +117,7 @@ function Tshirt() {
   const BUTTON_HEIGHT = 20;
   const dropdownStyle = {
     position: 'absolute',
-    top: '20px',
+    top: '10%',
     left: '20px',
     display: 'flex',
     flexDirection: 'column',
@@ -126,13 +139,14 @@ function Tshirt() {
 
 
   return (
-    <div style={{ width: '100vw', height: '100vh', position: 'relative' }}>
+    <div style={{overflow:"hidden", width: '100vw', height: '100vh', position: 'relative',backgroundColor:'black' }}>
       <Canvas shadows camera={{ position: [3, 3, 3], fov: 30 }}>
         <color attach="background" args={['#ececec']} />
         <OrbitControls />
         <Environment preset="sunset" background blur={4} />
         <ambientLight />
         <TshirtMesh
+        onModelLoad={handleModelLoad}
           customColors={{
             mesh: meshColor,
             arm: armColor,
@@ -144,6 +158,7 @@ function Tshirt() {
           }}
         />
       </Canvas>
+      ({modelLoaded ? <div>
       <div
         style={dropdownStyle}
       >
@@ -162,8 +177,7 @@ function Tshirt() {
         style={{
           position: 'absolute',
           top: '10%',
-          left: '90%',
-          transform: 'translate(-50%, -50%)',
+          left: isMobile?'70%':'90%',
         }}
       >
         <button style={{borderRadius:360,width: '100px', height: '100px'}}  onClick={galleryOpen}>
@@ -230,6 +244,9 @@ function Tshirt() {
               />
             </div>
         </div>
+        </div> : <div style={{ width: "100%", height: "100%" }}>
+  <div style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', color: 'white', padding: '10px 20px', borderRadius: '5px' }}><h1>Loading...</h1></div>
+</div> })
     </div>
   );
 }

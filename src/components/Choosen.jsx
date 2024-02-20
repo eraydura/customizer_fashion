@@ -4,6 +4,7 @@ import { useGesture } from "react-use-gesture";
 import { OrbitControls, useGLTF } from "@react-three/drei";
 import { FaChevronLeft, FaChevronRight } from "react-icons/fa";
 import { useNavigate } from 'react-router-dom';
+import { isMobile } from "react-device-detect";
 
 const modelPaths = [
   "/models/baseball_cap.glb",
@@ -35,13 +36,6 @@ const position =[
 export default function Choosen() {
   const [modelIndex, setModelIndex] = useState(0);
   const modelCount = modelPaths.length;
-
-  const bind = useGesture({
-    onDrag: ({ direction: [x] }) => {
-      if (x > 0.5) setModelIndex((index) => (index - 1 + modelCount) % modelCount);
-      else if (x < -0.5) setModelIndex((index) => (index + 1) % modelCount);
-    }
-  });
 
   const handlePrevClick = () => {
     setModelIndex((index) => (index - 1 + modelCount) % modelCount);
@@ -90,7 +84,7 @@ export default function Choosen() {
           <ModelLoader path={modelPaths[modelIndex]} />
         </group>
       </Canvas>
-      <div style={{ position: "absolute", top: "50%", transform: "translateY(-50%)", display: "flex", justifyContent: "space-between", width: "100%", padding: "0 1rem" }}>
+      <div style={{ position: "absolute", top: "50%",  display: "flex", justifyContent: "space-between", width: "100%", padding: "0 1rem" }}>
         <button onClick={handlePrevClick} style={{ outline: 0, border: 0, backgroundColor: 'transparent' }} disabled={modelIndex === 0}>
           <FaChevronLeft style={{ width:'50px', height:'50px', color: 'white' }} />
         </button>
@@ -98,20 +92,27 @@ export default function Choosen() {
           <FaChevronRight style={{ width:'50px', height:'50px',  color: 'white' }} />
         </button>
       </div>
-      <div style={{ position: "absolute", top: "10%" , transform: "translateY(-50%)", width: "100%", padding: "0 1rem" }}>
-        <button onClick={handleOkay} style={{ color: 'white', outline: 0, border: 0, backgroundColor: 'transparent', marginLeft: "1rem" }}>
-          SELECT
-        </button>
-      </div>
+      <div style={{ position: "absolute", left: isMobile? "10%": "25%" , top: "10%", color: "white" }}>
+          {isMobile ? (
+            <h1>WHICH ONE DO YOU <p>WANT TO CREATE?</p></h1>
+          ) : (
+            <h1>WHICH ONE DO YOU WANT TO CREATE?</h1>
+          )}
+        </div>
     </div>
-
-    <div style={{ marginTop: "1rem", display: "flex", alignItems: "center" }}>
+    <div style={ {top:"70%", position: "absolute",  display: "flex", alignItems: "center" }}>
+      <button onClick={handleOkay} style={{   backgroundColor: 'red',color: 'white',padding: '10px 20px',borderRadius: '5px',
+          cursor: 'pointer',fontSize: '16px',fontWeight: 'bold',textDecoration: 'none',   outline: 0, border: 0,   }}>
+            SELECT
+      </button>
+    </div>
+    <div style={isMobile ? { position: "absolute", top:'75%', marginTop: "1.5rem", display: "flex", alignItems: "center" } : { marginTop: "1rem", display: "flex", alignItems: "center" }}>
       {[...Array(modelCount)].map((_, index) => (
         <div
           key={index}
           style={{
-            width: "50px",
-            height: "50px",
+            width: isMobile ? "30px":"50px",
+            height: isMobile ? "30px":"50px",
             borderRadius: "50%",
             backgroundColor: index === modelIndex ? "#333" : "#ccc",
             margin: "0 0.5rem",

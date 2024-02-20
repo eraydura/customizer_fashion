@@ -11,15 +11,24 @@ import down from '../assets/cap_down.png';
 import up from '../assets/cap_up.png';
 import icon from '../assets/image.png';
 import { degToRad } from "three/src/math/MathUtils.js";
+import {isMobile} from 'react-device-detect';
 
-export function CapMesh(props) {
-  const { nodes, materials } = useGLTF("/models/baseball_cap.glb");
+
+export function CapMesh({ onModelLoad, ...props }) {
+  const { nodes, materials, scene } = useGLTF("/models/baseball_cap.glb");
+
+  // Notify parent component when model is loaded
+  React.useEffect(() => {
+    if (scene) {
+      onModelLoad();
+    }
+  }, [scene, onModelLoad]);
 
   return (
     <group {...props} dispose={null}>
     <group rotation={[-Math.PI / 2, 0, 0]} scale={0.005}>
-      <group position={[0.191, 190, 6.367]} scale={[195.252, 195.252, 222.442]}>
-      <mesh geometry={nodes.gorra002__0.geometry} material={materials.Fabric_1} material-color={props.customColors.up} >
+      <group position={[0.191, 190, 6.367]} scale={isMobile? [130.168, 130.168, 148,295]: [195.252, 195.252, 222.442]}>
+      <mesh geometry={nodes.gorra002__0.geometry} material={materials['White Cotton']} material-color={props.customColors.up} >
                 <Decal
               // debug // Makes "bounding box" of the decal visible
               position={props.customColors.pos} // Position of the decal
@@ -78,6 +87,13 @@ function Cap() {
   const [scale, setScale] = useState([0, 0, 0]);
   const partSelected = ['up', 'down'];
   const [selectedIndex, setSelectedIndex] = useState(0);
+  const [modelLoaded, setModelLoaded] = useState(false);
+
+  const handleModelLoad = () => {
+    setModelLoaded(true);
+    console.log(modelLoaded);
+  };
+
 
   const handlePartChange = (index) => {
     if(index==0 && uptexture=="./textures/wawa.png"){
@@ -129,13 +145,22 @@ function Cap() {
   const BUTTON_HEIGHT = 20;
   const dropdownStyle = {
     position: 'absolute',
-    top: '20px',
+    top: '10%',
     left: '20px',
     display: 'flex',
     flexDirection: 'column',
     justifyContent: 'flex-start',
     alignItems: 'flex-start',
   };
+  const slider= {
+    width: '100%', // make the input full width
+    height: '30px', // set a larger height
+    background: 'white', // set background color to white
+    borderRadius: '5px', // rounded corners
+    outline: 'none', // remove default focus outline
+    border: '1px solid #ccc', // add a border
+    cursor: 'pointer' // change cursor to pointer on hover
+  }
 
   // Calculate the gap dynamically based on the number of children elements
   const calculateDynamicGap = (containerHeight, numChildren) => {
@@ -151,13 +176,14 @@ function Cap() {
 
 
   return (
-    <div style={{ width: '100vw', height: '100vh', position: 'relative' }}>
+    <div style={{ overflow:"hidden", width: '100vw', height: '100vh', position: 'relative',backgroundColor: 'black' }}>
       <Canvas shadows camera={{ position: [3, 3, 3], fov: 30 }}>
         <color attach="background" args={['#ececec']} />
         <OrbitControls />
         <Environment preset="sunset" background blur={4} />
         <ambientLight />
         <CapMesh
+          onModelLoad={handleModelLoad}
           customColors={{
             up: upColor,
             down: downColor,
@@ -172,7 +198,9 @@ function Cap() {
           }}
         />
       </Canvas>
-      <div
+
+     ({modelLoaded ? <div >
+       <div
         style={dropdownStyle}
       >
         <input
@@ -181,20 +209,20 @@ function Cap() {
           onChange={(e) => handleColorChange(e.target.value)}
         />
         {partSelected.map((part, index) => (
-          <button style={{borderRadius:360, backgroundColor:''}} key={index} onClick={() => handlePartChange(index)}>
+          <button style={{    borderRadius:360, backgroundColor:''}} key={index} onClick={() => handlePartChange(index)}>
             <img src={part === 'up' ? up : down} alt={part} style={{ width: '80px', height: '80px' }} />
           </button>
         ))}
       </div>
+
       <div
         style={{
           position: 'absolute',
           top: '10%',
-          left: '90%',
-          transform: 'translate(-50%, -50%)',
+          left: isMobile?'70%':'90%',
         }}
       >
-        <button style={{borderRadius:360,width: '100px', height: '100px'}}  onClick={galleryOpen}>
+        <button style={{ borderRadius:360,width: '100px', height: '100px'}}  onClick={galleryOpen}>
           <img src={icon} alt="gallery" style={{ width: '50px', height: '50px' }} />
         </button>
       </div>
@@ -213,6 +241,7 @@ function Cap() {
                 onChange={handleSliderChange((value) =>
                   selectedIndex==0 ? setPosition((prev) => [value, prev[1], prev[2]]) :setPosition2((prev) => [value, prev[1], prev[2]])
                 )}
+                style={slider}
               />
             </div>
             <div>
@@ -227,6 +256,7 @@ function Cap() {
                 onChange={handleSliderChange((value) =>
                   selectedIndex==0 ? setPosition((prev) => [prev[0], value, prev[2]]) : setPosition2((prev) => [prev[0], value, prev[2]])
                 )}
+                style={slider}
               />
             </div>
             <div>
@@ -241,6 +271,7 @@ function Cap() {
                 onChange={handleSliderChange((value) =>
                   selectedIndex==0 ?setRotation((prev) => [prev[0], value, prev[2]]): setRotation2((prev) => [prev[0], value, prev[2]])
                 )}
+                style={slider}
               />
             </div>
             <div>
@@ -255,9 +286,14 @@ function Cap() {
                 onChange={handleSliderChange((value) =>
                   selectedIndex==0 ?  setScale([value, value, value]) : setScale2([value, value, value])
                 )}
+                style={slider}
               />
             </div>
         </div>
+     </div> : <div style={{ width: "100%", height: "100%" }}>
+  <div style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', color: 'white', padding: '10px 20px', borderRadius: '5px' }}><h1>Loading...</h1></div>
+</div>})
+     
         
     </div>
   );
