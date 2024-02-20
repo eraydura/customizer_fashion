@@ -100,7 +100,7 @@ export default function Choosen() {
           )}
         </div>
     </div>
-    <div style={ {top:"85%", position: "absolute",  display: "flex", alignItems: "center" }}>
+    <div style={ {top:"80%", position: "absolute",  display: "flex", alignItems: "center" }}>
       <button onClick={handleOkay} style={{   backgroundColor: 'red',color: 'white',padding: '10px 20px',borderRadius: '5px',
           cursor: 'pointer',fontSize: '16px',fontWeight: 'bold',textDecoration: 'none',   outline: 0, border: 0,   }}>
             SELECT
