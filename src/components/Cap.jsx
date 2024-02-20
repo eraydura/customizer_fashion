@@ -12,7 +12,7 @@ import up from '../assets/cap_up.png';
 import icon from '../assets/image.png';
 import { degToRad } from "three/src/math/MathUtils.js";
 import {isMobile} from 'react-device-detect';
-
+import '../index.css';
 
 export function CapMesh({ onModelLoad, ...props }) {
   const { nodes, materials, scene } = useGLTF("/models/baseball_cap.glb");
@@ -90,6 +90,10 @@ function Cap() {
   const [selectedIndex, setSelectedIndex] = useState(0);
   const [modelLoaded, setModelLoaded] = useState(false);
 
+  const getBackgroundSize = (value, min, max) => {
+    return { backgroundSize: `${((value - min) * 100) / (max - min)}% 100%` };
+  };
+
   const handleModelLoad = () => {
     setModelLoaded(true);
     console.log(modelLoaded);
@@ -126,10 +130,10 @@ function Cap() {
       const file = event.target.files[0];
       const reader = new FileReader();
       reader.onload = () => {
-        if(uptexture==="./textures/wawa.png"&&selectedIndex==0){
+        if(uptexture!==reader.result&&selectedIndex==0){
           setDisplay("flex");
           setUpTexture(reader.result);
-        }else if(downtexture==="./textures/wawa.png"&&selectedIndex==1){
+        }else if(downtexture!==reader.result&&selectedIndex==1){
           setDisplay("flex");
           setDownTexture(reader.result);
         }
@@ -161,19 +165,9 @@ function Cap() {
     flexDirection: 'row',
     justifyContent: 'center',
     alignItems: 'center',
-    width: '50%', // Adjust the width as needed
-    margin: '0 auto', // This will center the container horizontally
+    width: '50%', 
+    margin: '0 auto', 
   };
-
-  const slider= {
-    width: '100%', // make the input full width
-    height: '30px', // set a larger height
-    background: 'white', // set background color to white
-    borderRadius: '5px', // rounded corners
-    outline: 'none', // remove default focus outline
-    border: '1px solid #ccc', // add a border
-    cursor: 'pointer' // change cursor to pointer on hover
-  }
 
   // Calculate the gap dynamically based on the number of children elements
   const calculateDynamicGap = (containerHeight, numChildren) => {
@@ -280,7 +274,7 @@ function Cap() {
                 onChange={handleSliderChange((value) =>
                   selectedIndex==0 ? setPosition((prev) => [value, prev[1], prev[2]]) :setPosition2((prev) => [value, prev[1], prev[2]])
                 )}
-                style={slider}
+                style={getBackgroundSize(selectedIndex==0 ? position[0] : position2[0],-10,10)}
               />
             </div>
             <div>
@@ -295,7 +289,7 @@ function Cap() {
                 onChange={handleSliderChange((value) =>
                   selectedIndex==0 ? setPosition((prev) => [prev[0], value, prev[2]]) : setPosition2((prev) => [prev[0], value, prev[2]])
                 )}
-                style={slider}
+                style={getBackgroundSize(selectedIndex==0 ? position[1] : position2[1],-2,2)}
               />
             </div>
             <div>
@@ -310,7 +304,7 @@ function Cap() {
                 onChange={handleSliderChange((value) =>
                   selectedIndex==0 ?setRotation((prev) => [prev[0], value, prev[2]]): setRotation2((prev) => [prev[0], value, prev[2]])
                 )}
-                style={slider}
+                style={getBackgroundSize(selectedIndex==0 ? rotation[1] : rotation2[1],-Math.PI,Math.PI)}
               />
             </div>
             <div>
@@ -318,14 +312,14 @@ function Cap() {
               <input
                 type="range"
                 id="scale"
-                min={1.5}
+                min={0}
                 max={5}
                 step={0.01}
                 value={selectedIndex==0 ? scale[0]: scale2[0]}
                 onChange={handleSliderChange((value) =>
                   selectedIndex==0 ?  setScale([value, value, value]) : setScale2([value, value, value])
                 )}
-                style={slider}
+                style={getBackgroundSize(selectedIndex==0 ? scale[0]: scale2[0],0,5)}
               />
             </div>
         </div>

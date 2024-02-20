@@ -88,6 +88,10 @@ function Dress() {
   const [selectedIndex, setSelectedIndex] = useState(0);
   const [modelLoaded, setModelLoaded] = useState(false);
 
+  const getBackgroundSize = (value, min, max) => {
+    return { backgroundSize: `${((value - min) * 100) / (max - min)}% 100%` };
+  };
+
   const handleModelLoad = () => {
     setModelLoaded(true);
     console.log(modelLoaded);
@@ -123,10 +127,10 @@ function Dress() {
       const file = event.target.files[0];
       const reader = new FileReader();
       reader.onload = () => {
-        if(uptexture==="./textures/wawa.png"&&selectedIndex==0){
+        if(uptexture!==reader.result &&selectedIndex==0){
           setDisplay("flex");
           setUpTexture(reader.result);
-        }else if(downtexture==="./textures/wawa.png"&&selectedIndex==1){
+        }else if(downtexture!==reader.result&&selectedIndex==1){
           setDisplay("flex");
           setDownTexture(reader.result);
         }
@@ -260,10 +264,11 @@ function Dress() {
                 min={-10}
                 max={10}
                 step={0.01}
-                value={position[0]}
+                value={selectedIndex==0 ? position[0]: position2[0]}
                 onChange={handleSliderChange((value) =>
                   selectedIndex==0 ? setPosition((prev) => [value, prev[1], prev[2]]) :setPosition2((prev) => [value, prev[1], prev[2]])
                 )}
+                style={getBackgroundSize(selectedIndex==0 ? position[0]: position2[0],-10,10)}
               />
             </div>
             <div>
@@ -274,10 +279,11 @@ function Dress() {
                 min={90}
                 max={150}
                 step={0.01}
-                value={position[1]}
+                value={selectedIndex==0 ? position[1]: position2[1]}
                 onChange={handleSliderChange((value) =>
                   selectedIndex==0 ? setPosition((prev) => [prev[0], value, prev[2]]) : setPosition2((prev) => [prev[0], value, prev[2]])
                 )}
+                style={getBackgroundSize(selectedIndex==0 ? position[1]: position2[1],90,150)}
               />
             </div>
             <div>
@@ -288,10 +294,11 @@ function Dress() {
                 min={-Math.PI}
                 max={Math.PI}
                 step={degToRad(1)}
-                value={rotation[1]}
+                value={selectedIndex==0 ? rotation[1]: rotation2[1]}
                 onChange={handleSliderChange((value) =>
                   selectedIndex==0 ?setRotation((prev) => [prev[0], value, prev[2]]): setRotation2((prev) => [prev[0], value, prev[2]])
                 )}
+                style={getBackgroundSize(selectedIndex==0 ? rotation[1]: rotation2[1],-Math.PI,Math.PI)}
               />
             </div>
             <div>
@@ -302,10 +309,11 @@ function Dress() {
                 min={0.1}
                 max={1000}
                 step={0.01}
-                value={scale[0]}
+                value={selectedIndex==0 ? scale[0]: scale2[0]}
                 onChange={handleSliderChange((value) =>
                   selectedIndex==0 ?  setScale([value, value, value]) : setScale2([value, value, value])
                 )}
+                style={getBackgroundSize(selectedIndex==0 ? scale[0]: scale2[0],0.1,1000)}
               />
             </div>
         </div>

@@ -58,12 +58,16 @@ function Hoodie() {
   const [soulColor, setSoulColor] = useState('#ffffff');
   const [display, setDisplay] = useState('none');
   const [texture, setTexture] = useState("./textures/wawa.png");
-  const [position, setPosition] = useState([0, 0, 0]);
+  const [position, setPosition] = useState([0, 80, 0]);
   const [rotation, setRotation] = useState([0, 0, 0]);
   const [scale, setScale] = useState([0, 0, 0]);
   const partSelected = ['mesh', 'stripes', 'soul'];
   const [selectedIndex, setSelectedIndex] = useState(0);
   const [modelLoaded, setModelLoaded] = useState(false);
+
+  const getBackgroundSize = (value, min, max) => {
+    return { backgroundSize: `${((value - min) * 100) / (max - min)}% 100%` };
+  };
 
   const handleModelLoad = () => {
     setModelLoaded(true);
@@ -98,9 +102,9 @@ function Hoodie() {
       const file = event.target.files[0];
       const reader = new FileReader();
       reader.onload = () => {
-        if(texture==="./textures/wawa.png"){
-          setScale([1,1,1]);
+        if(texture!==reader.result){
           setDisplay("flex");
+          setScale([38,38,38]);
         }
         setTexture(reader.result);
       };
@@ -235,6 +239,7 @@ function Hoodie() {
                 onChange={handleSliderChange((value) =>
                   setPosition((prev) => [value, prev[1], prev[2]])
                 )}
+                style={getBackgroundSize(position[0],-30,30)}
               />
             </div>
             <div>
@@ -249,6 +254,7 @@ function Hoodie() {
                 onChange={handleSliderChange((value) =>
                   setPosition((prev) => [prev[0], value, prev[2]])
                 )}
+                style={getBackgroundSize(position[1],80,200)}
               />
             </div>
             <div>
@@ -263,6 +269,7 @@ function Hoodie() {
                 onChange={handleSliderChange((value) =>
                   setRotation((prev) => [prev[0], value, prev[2]])
                 )}
+                style={getBackgroundSize(rotation[1],-Math.PI,Math.PI)}
               />
             </div>
             <div>
@@ -277,6 +284,7 @@ function Hoodie() {
                 onChange={handleSliderChange((value) =>
                   setScale([value, value, value])
                 )}
+                style={getBackgroundSize(scale[0],38,150)}
               />
             </div>
         </div>

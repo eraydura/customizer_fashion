@@ -66,6 +66,10 @@ function Mug() {
   const [scale, setScale] = useState([0, 0, 0]);
   const [modelLoaded, setModelLoaded] = useState(false);
 
+  const getBackgroundSize = (value, min, max) => {
+    return { backgroundSize: `${((value - min) * 100) / (max - min)}% 100%` };
+  };
+
   const handleModelLoad = () => {
     setModelLoaded(true);
     console.log(modelLoaded);
@@ -79,7 +83,7 @@ function Mug() {
       const file = event.target.files[0];
       const reader = new FileReader();
       reader.onload = () => {
-        if(texture==="./textures/wawa.png"){
+        if(texture!==reader.result){
           setScale([5,5,5]);
           setDisplay("flex");
         }
@@ -172,6 +176,7 @@ function Mug() {
                 onChange={handleSliderChange((value) =>
                   setPosition((prev) => [value, prev[1], prev[2]])
                 )}
+                style={getBackgroundSize(position[0],-3,3)}
               />
             </div>
             <div>
@@ -186,6 +191,7 @@ function Mug() {
                 onChange={handleSliderChange((value) =>
                   setPosition((prev) => [prev[0], value, prev[2]])
                 )}
+                style={getBackgroundSize(position[1],-3,3)}
               />
             </div>
             <div>
@@ -200,6 +206,7 @@ function Mug() {
                 onChange={handleSliderChange((value) =>
                   setRotation((prev) => [prev[0], value, prev[2]])
                 )}
+                style={getBackgroundSize(rotation[1],-Math.PI,Math.PI)}
               />
             </div>
             <div>
@@ -214,6 +221,7 @@ function Mug() {
                 onChange={handleSliderChange((value) =>
                   setScale([value, value, value])
                 )}
+                style={getBackgroundSize(scale[0],0.1,5)}
               />
             </div>
         </div>

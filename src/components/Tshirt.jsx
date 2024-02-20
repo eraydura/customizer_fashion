@@ -66,6 +66,11 @@ function Tshirt() {
   const [selectedIndex, setSelectedIndex] = useState(0);
   const [modelLoaded, setModelLoaded] = useState(false);
 
+  const getBackgroundSize = (value, min, max) => {
+    return { backgroundSize: `${((value - min) * 100) / (max - min)}% 100%` };
+  };
+
+
   const handleModelLoad = () => {
     setModelLoaded(true);
     console.log(modelLoaded);
@@ -99,7 +104,7 @@ function Tshirt() {
       const file = event.target.files[0];
       const reader = new FileReader();
       reader.onload = () => {
-        if(texture==="./textures/wawa.png"){
+        if(texture!==reader.result){
           setScale([1,1,1]);
           setDisplay("flex");
         }
@@ -236,6 +241,7 @@ function Tshirt() {
                 onChange={handleSliderChange((value) =>
                   setPosition((prev) => [value, prev[1], prev[2]])
                 )}
+                style={getBackgroundSize(position[0],-3,3)}
               />
             </div>
             <div>
@@ -250,6 +256,7 @@ function Tshirt() {
                 onChange={handleSliderChange((value) =>
                   setPosition((prev) => [prev[0], value, prev[2]])
                 )}
+                style={getBackgroundSize(position[1],1,3)}
               />
             </div>
             <div>
@@ -264,6 +271,7 @@ function Tshirt() {
                 onChange={handleSliderChange((value) =>
                   setRotation((prev) => [prev[0], value, prev[2]])
                 )}
+                style={getBackgroundSize(rotation[1],-Math.PI,Math.PI)}
               />
             </div>
             <div>
@@ -278,6 +286,7 @@ function Tshirt() {
                 onChange={handleSliderChange((value) =>
                   setScale([value, value, value])
                 )}
+                style={getBackgroundSize(scale[0],0.1,5)}
               />
             </div>
         </div>
