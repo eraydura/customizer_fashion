@@ -132,12 +132,12 @@ function Hoodie() {
   const dropdownStyle2 = {
     position: 'absolute',
     top: '3%',
-    left: '25%',
+    right: '10%',
     display: 'flex',
     flexDirection: 'row',
     justifyContent: 'center',
     alignItems: 'center',
-    width: '50%', // Adjust the width as needed
+    width: '80%', // Adjust the width as needed
     margin: '0 auto', // This will center the container horizontally
   };
 
@@ -199,14 +199,13 @@ function Hoodie() {
                     style={{ 
                       borderRadius: 360,
                       border:0,
-                      width: '60px', 
-                      height: '60px',
+                      width: '100%', height: '100%',
                       backgroundColor: part === partSelected[selectedIndex] ? "green" : "transparent" // Apply green border if selected, otherwise no border
                     }} 
                     key={index} 
                     onClick={() => handlePartChange(index)}
                   >
-             <img src={part === 'mesh' ? meshs : part === 'stripes' ? stripeimage : souls} alt={part} style={{ width: '40px', height: '40px' }} />
+             <img src={part === 'mesh' ? meshs : part === 'stripes' ? stripeimage : souls} alt={part} style={{ width: '100%', height: '100%' }} />
           </button>
         ))}
         </div>
@@ -232,13 +231,51 @@ function Hoodie() {
           right: '5%',
         }}
       >
-        <button style={{ borderRadius:360,width: !isMobile? '100px'  :'60px', height: !isMobile?'100px':'60px'}}  onClick={galleryOpen}>
-          <img src={icon} alt="gallery" style={{ width: !isMobile? '50px' : '35px', height: !isMobile? '50px' :'35px'}} />
-        </button>
+<button 
+  style={{ 
+    backgroundColor: "white",
+    borderRadius: 360,
+    width: !isMobile ? '100px' : '60px', 
+    height: !isMobile ? '100px' : '60px',
+    display: "flex",
+    justifyContent: "center",
+    alignItems: "center"
+  }}  
+  onClick={galleryOpen}
+>
+  <img 
+    src={icon} 
+    alt="gallery" 
+    style={{ 
+      width: !isMobile ? '50px' : '35px', 
+      height: !isMobile ? '50px' : '35px'
+    }} 
+  />
+</button>
       </div>
 
-      <div style={{ position: 'absolute', bottom: '10%', right: '5%' }}>
-            <button style={{ borderRadius:360,width: !isMobile? '100px'  :'60px', height: !isMobile?'100px':'60px'}} onClick={saveCanvasAsImage}><img src={share} alt="gallery" style={{ width: !isMobile? '50px' : '35px', height: !isMobile? '50px' :'35px'}} /></button>
+      <div style={{ backgroundColor:"white",borderRadius:360,position: 'absolute', bottom: '10%', right: '5%' }}>
+      <button 
+  style={{ 
+    display: "flex",
+    justifyContent: "center",
+    alignItems: "center",
+    alignContent: "center",
+    borderRadius: 360,
+    width: !isMobile ? '100px' : '60px', 
+    height: !isMobile ? '100px' : '60px'
+  }} 
+  onClick={saveCanvasAsImage}
+>
+  <img 
+    src={share} 
+    alt="gallery" 
+    style={{ 
+      width: !isMobile ? '50px' : '35px', 
+      height: !isMobile ? '50px' : '35px'
+    }} 
+  />
+</button>
       </div>
 
       <div style={{display:display,     position: 'absolute',      top: isMobile? '40%':'90%',
