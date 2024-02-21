@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState,useRef } from 'react';
 import { Canvas,useLoader } from '@react-three/fiber';
 import {
   Environment,
@@ -7,6 +7,7 @@ import {
   useGLTF,
   useTexture
 } from '@react-three/drei';
+import share from '../assets/share.png';
 import arms from '../assets/arms.png';
 import body from '../assets/body.png';
 import neck from '../assets/neck.png';
@@ -65,6 +66,7 @@ function Tshirt() {
   const partSelected = ['mesh', 'arm', 'neck'];
   const [selectedIndex, setSelectedIndex] = useState(0);
   const [modelLoaded, setModelLoaded] = useState(false);
+  const canvasRef = useRef(null);
 
   const getBackgroundSize = (value, min, max) => {
     return { backgroundSize: `${((value - min) * 100) / (max - min)}% 100%` };
@@ -154,10 +156,19 @@ function Tshirt() {
   dropdownStyle.gap = dynamicGap + 'px';
   dropdownStyle2.gap = dynamicGap + 'px';
 
-
+  const saveCanvasAsImage = () => {
+    const canvas = canvasRef.current;
+    if (canvas) {
+      const dataURL = canvas.toDataURL();
+      const link = document.createElement('a');
+      link.href = dataURL;
+      link.download = 'canvas_image.png';
+      link.click();
+    }
+  };
   return (
     <div style={{overflow:"hidden", width: '100vw', height: '100vh', position: 'relative',backgroundColor:'black' }}>
-      <Canvas shadows camera={{ position: [3, 3, 3], fov: 30 }}>
+      <Canvas gl={{ preserveDrawingBuffer: true }}  ref={canvasRef} shadows camera={{ position: [3, 3, 3], fov: 30 }}>
         <color attach="background" args={['#ececec']} />
         <OrbitControls />
         <Environment preset="sunset" background blur={4} />
@@ -210,8 +221,8 @@ function Tshirt() {
           onChange={(e) => handleColorChange(e.target.value)}
         />
         {partSelected.map((part, index) => (
-          <button style={{ backgroundColor: part === partSelected[selectedIndex] ? "green" :"white",border:0,   borderRadius:360 }} key={index} onClick={() => handlePartChange(index)}>
-            <img src={part === 'mesh' ? body : part === 'arm' ? arms : neck} alt={part} style={{ width: '80px', height: '80px' }} />
+          <button style={{ backgroundColor: part === partSelected[selectedIndex] ? "green" :"white",border:0, borderRadius:360, display: 'flex', justifyContent: 'center', alignItems: 'center' }} key={index} onClick={() => handlePartChange(index)}>
+            <img src={part === 'mesh' ? body : part === 'arm' ? arms : neck} alt={part} style={{ maxWidth: '80px', maxHeight: '80px' }} />
           </button>
         ))}
       </div> })
@@ -219,14 +230,16 @@ function Tshirt() {
         style={{
           position: 'absolute',
           top: '10%',
-          left: isMobile?'70%':'90%',
+          right: '5%',
         }}
       >
         <button style={{ borderRadius:360,width: !isMobile? '100px'  :'60px', height: !isMobile?'100px':'60px'}}  onClick={galleryOpen}>
           <img src={icon} alt="gallery" style={{ width: !isMobile? '50px' : '35px', height: !isMobile? '50px' :'35px'}} />
         </button>
       </div>
-
+      <div style={{ position: 'absolute', bottom: '10%', right: '5%' }}>
+            <button style={{ borderRadius:360,width: !isMobile? '100px'  :'60px', height: !isMobile?'100px':'60px'}} onClick={saveCanvasAsImage}><img src={share} alt="gallery" style={{ width: !isMobile? '50px' : '35px', height: !isMobile? '50px' :'35px'}} /></button>
+      </div>
       <div style={{display:display,     position: 'absolute',      top: isMobile? '40%':'90%',
           left: '10%', flexDirection: isMobile?'column':'row',gap: isMobile?'5px':'150px'}}>
             <div>

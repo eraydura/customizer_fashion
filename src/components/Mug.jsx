@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState,useRef } from 'react';
 import { Canvas } from '@react-three/fiber';
 import {
   Environment,
@@ -7,6 +7,7 @@ import {
   useGLTF,
   useTexture
 } from '@react-three/drei';
+import share from '../assets/share.png';
 import icon from '../assets/image.png';
 import { degToRad } from "three/src/math/MathUtils.js";
 import {isMobile} from 'react-device-detect';
@@ -65,6 +66,7 @@ function Mug() {
   const [rotation, setRotation] = useState([0, 0, 0]);
   const [scale, setScale] = useState([0, 0, 0]);
   const [modelLoaded, setModelLoaded] = useState(false);
+  const canvasRef = useRef(null);
 
   const getBackgroundSize = (value, min, max) => {
     return { backgroundSize: `${((value - min) * 100) / (max - min)}% 100%` };
@@ -112,9 +114,20 @@ function Mug() {
     alignItems: 'flex-start',
   };
 
+  const saveCanvasAsImage = () => {
+    const canvas = canvasRef.current;
+    if (canvas) {
+      const dataURL = canvas.toDataURL();
+      const link = document.createElement('a');
+      link.href = dataURL;
+      link.download = 'canvas_image.png';
+      link.click();
+    }
+  };
+
   return (
     <div style={{overflow:"hidden", width: '100vw', height: '100vh', position: 'relative',backgroundColor:'black' }}>
-      <Canvas shadows camera={{ position: [3, 3, 3], fov: 30 }}>
+      <Canvas gl={{ preserveDrawingBuffer: true }}  ref={canvasRef} shadows camera={{ position: [3, 3, 3], fov: 30 }}>
         <color attach="background" args={['#ececec']} />
         <OrbitControls />
         <Environment preset="sunset" background blur={4} />
@@ -154,14 +167,16 @@ function Mug() {
         style={{
           position: 'absolute',
           top: '10%',
-          left: isMobile?'70%':'90%',
+          right: '5%',
         }}
       >
         <button style={{borderRadius:360,width: isMobile? '50px':'100px', height: isMobile? '50px':'100px'}}  onClick={galleryOpen}>
           <img src={icon} alt="gallery" style={{ width: isMobile? '25px':'50px', height: isMobile? '25px':'50px' }} />
         </button>
       </div>
-
+      <div style={{ position: 'absolute', bottom: '10%', right: '5%' }}>
+            <button style={{ borderRadius:360,width: !isMobile? '100px'  :'60px', height: !isMobile?'100px':'60px'}} onClick={saveCanvasAsImage}><img src={share} alt="gallery" style={{ width: !isMobile? '50px' : '35px', height: !isMobile? '50px' :'35px'}} /></button>
+      </div>
       <div style={{display:display,     position: 'absolute',      top: isMobile? '40%':'90%',
           left: '10%', flexDirection: isMobile?'column':'row',gap: isMobile?'5px':'150px'}}>
             <div>

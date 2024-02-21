@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState,useRef } from 'react';
 import { Canvas } from '@react-three/fiber';
 import {
   Environment,
@@ -7,6 +7,7 @@ import {
   useGLTF,
   useTexture
 } from '@react-three/drei';
+import share from '../assets/share.png';
 import souls from '../assets/soul.png';
 import meshs from '../assets/mesh.png';
 import stripeimage from '../assets/stripes.png';
@@ -118,6 +119,7 @@ function Shoes() {
   const partSelected = ['mesh', 'stripes', 'soul'];
   const [selectedIndex, setSelectedIndex] = useState(0);
   const [modelLoaded, setModelLoaded] = useState(false);
+  const canvasRef = useRef(null);
 
   const getBackgroundSize = (value, min, max) => {
     return { backgroundSize: `${((value - min) * 100) / (max - min)}% 100%` };
@@ -194,6 +196,17 @@ function Shoes() {
     margin: '0 auto', // This will center the container horizontally
   };
 
+  const saveCanvasAsImage = () => {
+    const canvas = canvasRef.current;
+    if (canvas) {
+      const dataURL = canvas.toDataURL();
+      const link = document.createElement('a');
+      link.href = dataURL;
+      link.download = 'canvas_image.png';
+      link.click();
+    }
+  };
+
   // Calculate the gap dynamically based on the number of children elements
   const calculateDynamicGap = (containerHeight, numChildren) => {
     const totalGap = containerHeight - (numChildren * BUTTON_HEIGHT); // Assuming BUTTON_HEIGHT is constant
@@ -210,7 +223,7 @@ function Shoes() {
 
   return (
     <div style={{overflow:"hidden", width: '100vw', height: '100vh', position: 'relative',backgroundColor:'black' }}>
-      <Canvas shadows camera={{ position: [3, 3, 3], fov: 30 }}>
+      <Canvas gl={{ preserveDrawingBuffer: true }}  ref={canvasRef} shadows camera={{ position: [3, 3, 3], fov: 30 }}>
         <color attach="background" args={['#ececec']} />
         <OrbitControls />
         <Environment preset="sunset" background blur={4} />
@@ -263,7 +276,7 @@ function Shoes() {
           onChange={(e) => handleColorChange(e.target.value)}
         />
         {partSelected.map((part, index) => (
-          <button style={{ backgroundColor: part === partSelected[selectedIndex] ? "green" :"white",border:0,    borderRadius:360 }} key={index} onClick={() => handlePartChange(index)}>
+          <button style={{ backgroundColor: part === partSelected[selectedIndex] ? "green" :"white",border:0, borderRadius:360, display: 'flex', justifyContent: 'center', alignItems: 'center' }} key={index} onClick={() => handlePartChange(index)}>
             <img src={part === 'mesh' ? meshs : part === 'stripes' ? stripeimage : souls} alt={part} style={{ width: '80px', height: '80px' }} />
           </button>
         ))}
@@ -272,14 +285,16 @@ function Shoes() {
         style={{
           position: 'absolute',
           top: '10%',
-          left: isMobile?'70%':'90%',
+          right: '5%',
         }}
       >
         <button style={{ borderRadius:360,width: !isMobile? '100px'  :'60px', height: !isMobile?'100px':'60px'}}  onClick={galleryOpen}>
           <img src={icon} alt="gallery" style={{ width: !isMobile? '50px' : '35px', height: !isMobile? '50px' :'35px'}} />
         </button>
       </div>
-
+      <div style={{ position: 'absolute', bottom: '10%', right: '5%' }}>
+            <button style={{ borderRadius:360,width: !isMobile? '100px'  :'60px', height: !isMobile?'100px':'60px'}} onClick={saveCanvasAsImage}><img src={share} alt="gallery" style={{ width: !isMobile? '50px' : '35px', height: !isMobile? '50px' :'35px'}} /></button>
+      </div>
       <div style={{display:display,     position: 'absolute',      top: isMobile? '40%':'90%',
           left: '10%', flexDirection: isMobile?'column':'row',gap: isMobile?'5px':'150px'}}>
             <div>

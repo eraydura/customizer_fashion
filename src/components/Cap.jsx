@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { Canvas } from '@react-three/fiber';
 import {
   Environment,
@@ -10,6 +10,7 @@ import {
 import down from '../assets/cap_down.png';
 import up from '../assets/cap_up.png';
 import icon from '../assets/image.png';
+import share from '../assets/share.png';
 import { degToRad } from "three/src/math/MathUtils.js";
 import {isMobile} from 'react-device-detect';
 import '../index.css';
@@ -89,6 +90,7 @@ function Cap() {
   const partSelected = ['up', 'down'];
   const [selectedIndex, setSelectedIndex] = useState(0);
   const [modelLoaded, setModelLoaded] = useState(false);
+  const canvasRef = useRef(null);
 
   const getBackgroundSize = (value, min, max) => {
     return { backgroundSize: `${((value - min) * 100) / (max - min)}% 100%` };
@@ -169,6 +171,17 @@ function Cap() {
     margin: '0 auto', 
   };
 
+  const saveCanvasAsImage = () => {
+    const canvas = canvasRef.current;
+    if (canvas) {
+      const dataURL = canvas.toDataURL();
+      const link = document.createElement('a');
+      link.href = dataURL;
+      link.download = 'canvas_image.png';
+      link.click();
+    }
+  };
+
   // Calculate the gap dynamically based on the number of children elements
   const calculateDynamicGap = (containerHeight, numChildren) => {
     const totalGap = containerHeight - (numChildren * BUTTON_HEIGHT); // Assuming BUTTON_HEIGHT is constant
@@ -185,7 +198,7 @@ function Cap() {
 
   return (
     <div style={{ overflow:"hidden", width: '100vw', height: '100vh', position: 'relative',backgroundColor: 'black' }}>
-      <Canvas shadows camera={{ position: [3, 3, 3], fov: 30 }}>
+      <Canvas gl={{ preserveDrawingBuffer: true }}  ref={canvasRef} shadows camera={{ position: [3, 3, 3], fov: 30 }}>
         <color attach="background" args={['#ececec']} />
         <OrbitControls />
         <Environment preset="sunset" background blur={4} />
@@ -242,9 +255,9 @@ function Cap() {
           onChange={(e) => handleColorChange(e.target.value)}
         />
         {partSelected.map((part, index) => (
-          <button style={{  backgroundColor: part === partSelected[selectedIndex] ? "green" :"white",border:0,  borderRadius:360 }} key={index} onClick={() => handlePartChange(index)}>
-            <img src={part === 'up' ? up : down} alt={part} style={{ width:  '80px', height: '80px' }} />
-          </button>
+          <button style={{ backgroundColor: part === partSelected[selectedIndex] ? "green" :"white",border:0, borderRadius:360, display: 'flex', justifyContent: 'center', alignItems: 'center' }} key={index} onClick={() => handlePartChange(index)}>
+           <img src={part === 'up' ? up : down} alt={part} style={{ width: '80px', height: '80px' }} />
+        </button>
         ))}
       </div> })
 
@@ -252,12 +265,15 @@ function Cap() {
         style={{
           position: 'absolute',
           top: '10%',
-          left: '90%',
+          right: '5%',
         }}
       >
         <button style={{ borderRadius:360,width: !isMobile? '100px'  :'60px', height: !isMobile?'100px':'60px'}}  onClick={galleryOpen}>
           <img src={icon} alt="gallery" style={{ width: !isMobile? '50px' : '35px', height: !isMobile? '50px' :'35px'}} />
         </button>
+      </div>
+      <div style={{ position: 'absolute', bottom: '10%', right: '5%' }}>
+            <button style={{ borderRadius:360,width: !isMobile? '100px'  :'60px', height: !isMobile?'100px':'60px'}} onClick={saveCanvasAsImage}><img src={share} alt="gallery" style={{ width: !isMobile? '50px' : '35px', height: !isMobile? '50px' :'35px'}} /></button>
       </div>
 
         <div style={{display:display,     position: 'absolute',      top: isMobile? '40%':'90%',
