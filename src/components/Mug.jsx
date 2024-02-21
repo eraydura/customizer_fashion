@@ -8,6 +8,8 @@ import {
   useTexture
 } from '@react-three/drei';
 import share from '../assets/share.png';
+import open from '../assets/open.png';
+import closeimage from '../assets/close.png';
 import icon from '../assets/image.png';
 import { degToRad } from "three/src/math/MathUtils.js";
 import {isMobile} from 'react-device-detect';
@@ -32,8 +34,6 @@ export function Shoe({ onModelLoad, ...props }) {
         <mesh      material-metalness={0.5}
       material-roughness={0.5} geometry={nodes.Arc001_1002_3.geometry} material={materials['01___Default.002']} material-color={props.customColors.mesh} />
 <mesh geometry={nodes.Arc001_1002_4.geometry} material={materials['printable.002']}>
-        
-        <meshBasicMaterial transparent opacity={0} />
 
             <Decal
               // debug // Makes "bounding box" of the decal visible
@@ -42,7 +42,7 @@ export function Shoe({ onModelLoad, ...props }) {
               scale={props.customColors.scale} // Scale of the decal
             >
 
-               <meshStandardMaterial
+            <meshPhongMaterial transparent 
                 map={useTexture(props.customColors.texture)}
                 toneMapped={true}
                 polygonOffset
@@ -66,10 +66,21 @@ function Mug() {
   const [rotation, setRotation] = useState([0, 0, 0]);
   const [scale, setScale] = useState([0, 0, 0]);
   const [modelLoaded, setModelLoaded] = useState(false);
+  const [close, setClose] = useState(true);
   const canvasRef = useRef(null);
 
   const getBackgroundSize = (value, min, max) => {
     return { backgroundSize: `${((value - min) * 100) / (max - min)}% 100%` };
+  };
+
+  const handleClose = () => {
+    if(close==true){
+      setDisplay("none");
+      setClose(false);
+    }else{
+      setDisplay("flex");
+      setClose(true);
+    }
   };
 
   const handleModelLoad = () => {
@@ -192,7 +203,7 @@ function Mug() {
   />
 </button>
       </div>
-      <div style={{ backgroundColor:"white",borderRadius:360,position: 'absolute', bottom: '10%', right: '5%' }}>
+      <div style={{ backgroundColor:"white",borderRadius:360,position: 'absolute', bottom: '20%', right: '5%' }}>
       <button 
   style={{ 
     display: "flex",
@@ -215,6 +226,7 @@ function Mug() {
   />
 </button>
       </div>
+      ({isMobile && texture!="./textures/wawa.png"  && <div style={{position: 'absolute',top: '35%',left: '5%' ,width:'50px',height:'50px'}}> <button onClick={handleClose}><img src={close ? closeimage:open }></img></button> </div> })
       <div style={{display:display,     position: 'absolute',      top: isMobile? '40%':'90%',
           left: '10%', flexDirection: isMobile?'column':'row',gap: isMobile?'5px':'150px'}}>
             <div>

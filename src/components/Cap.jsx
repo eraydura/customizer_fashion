@@ -10,6 +10,8 @@ import {
 import down from '../assets/cap_down.png';
 import up from '../assets/cap_up.png';
 import icon from '../assets/image.png';
+import open from '../assets/open.png';
+import closeimage from '../assets/close.png';
 import share from '../assets/share.png';
 import { degToRad } from "three/src/math/MathUtils.js";
 import {isMobile} from 'react-device-detect';
@@ -37,7 +39,7 @@ export function CapMesh({ onModelLoad, ...props }) {
               scale={props.customColors.scale} // Scale of the decal
             >
 
-               <meshStandardMaterial
+              <meshPhongMaterial transparent 
                 map={useTexture(props.customColors.uptexture)}
                 normalMap={useTexture("./textures/fabric.png")}
                 toneMapped={true}
@@ -56,7 +58,7 @@ export function CapMesh({ onModelLoad, ...props }) {
               scale={props.customColors.scale2} // Scale of the decal
             >
 
-               <meshStandardMaterial
+              <meshPhongMaterial transparent 
                 map={useTexture(props.customColors.downtexture)}
                 normalMap={useTexture("./textures/fabric.png")}
                 toneMapped={true}
@@ -79,17 +81,19 @@ function Cap() {
   const [upColor, setUpColor] = useState('#ffffff');
   const [downColor, setDownColor] = useState('#ffffff');
   const [display, setDisplay] = useState('none');
+  const [display2, setDisplay2] = useState('none');
   const [uptexture, setUpTexture] = useState("./textures/wawa.png");
   const [downtexture, setDownTexture] = useState("./textures/wawa.png");
   const [position, setPosition] = useState([0, 0, 0]);
   const [rotation, setRotation] = useState([0, 0, 0]);
-  const [position2, setPosition2] = useState([0, 0, 0]);
+  const [position2, setPosition2] = useState([0, -1, 0]);
   const [rotation2, setRotation2] = useState([0, 0, 0]);
-  const [scale2, setScale2] = useState([0, 0, 0]);
-  const [scale, setScale] = useState([0, 0, 0]);
+  const [scale2, setScale2] = useState([2, 2, 2]);
+  const [scale, setScale] = useState([1, 1, 1]);
   const partSelected = ['up', 'down'];
   const [selectedIndex, setSelectedIndex] = useState(0);
   const [modelLoaded, setModelLoaded] = useState(false);
+  const [close, setClose] = useState(false);
   const canvasRef = useRef(null);
 
   const getBackgroundSize = (value, min, max) => {
@@ -101,12 +105,26 @@ function Cap() {
     console.log(modelLoaded);
   };
 
+  const handleClose = () => {
+    if(close==true){
+      setDisplay("none");
+      setClose(false);
+    }else{
+      setDisplay("flex");
+      setClose(true);
+    }
+  };
+
 
   const handlePartChange = (index) => {
     if(index==0 && uptexture=="./textures/wawa.png"){
       setDisplay("none");
+      setClose(false);
+      setDisplay2("none");
     }else if(index==1 && downtexture=="./textures/wawa.png"){
       setDisplay("none");
+      setClose(false);
+      setDisplay2("none");
     }
     setSelectedIndex(index);
   };
@@ -134,9 +152,13 @@ function Cap() {
       reader.onload = () => {
         if(uptexture!==reader.result&&selectedIndex==0){
           setDisplay("flex");
+          setClose(true);
+          setDisplay2("block");
           setUpTexture(reader.result);
         }else if(downtexture!==reader.result&&selectedIndex==1){
           setDisplay("flex");
+          setClose(true);
+          setDisplay2("block");
           setDownTexture(reader.result);
         }
       };
@@ -290,7 +312,7 @@ function Cap() {
   />
 </button>
       </div>
-      <div style={{ backgroundColor:"white",borderRadius:360,position: 'absolute', bottom: '10%', right: '5%' }}>
+      <div style={{ backgroundColor:"white",borderRadius:360,position: 'absolute', bottom: '20%', right: '5%' }}>
       <button 
   style={{ 
     display: "flex",
@@ -313,8 +335,8 @@ function Cap() {
   />
 </button>
       </div>
-
-        <div style={{display:display,     position: 'absolute',      top: isMobile? '40%':'90%',
+       ({isMobile && (uptexture!="./textures/wawa.png" || downtexture!="./textures/wawa.png" ) && <div style={{display:display2,position: 'absolute',top: '35%',left: '5%' ,width:'50px',height:'50px'}}> <button onClick={handleClose}><img src={close ? closeimage:open }></img></button> </div> })
+       <div style={{display:display,     position: 'absolute',      top: isMobile? '40%':'90%',
           left: '10%', flexDirection: isMobile?'column':'row',gap: isMobile?'5px':'150px'}}>
  <div>
               <label htmlFor="posX">Position X</label>

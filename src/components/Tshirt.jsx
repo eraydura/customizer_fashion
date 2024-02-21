@@ -9,6 +9,8 @@ import {
 } from '@react-three/drei';
 import share from '../assets/share.png';
 import arms from '../assets/arms.png';
+import open from '../assets/open.png';
+import closeimage from '../assets/close.png';
 import body from '../assets/body.png';
 import neck from '../assets/neck.png';
 import icon from '../assets/image.png';
@@ -36,7 +38,7 @@ export function TshirtMesh({ onModelLoad, ...props }) {
               scale={props.customColors.scale} // Scale of the decal
             >
 
-               <meshStandardMaterial
+             <meshPhongMaterial transparent 
                 map={useTexture(props.customColors.texture)}
                 normalMap={useLoader(TextureLoader,"./textures/fabric.png")}
                 toneMapped={true}
@@ -60,12 +62,13 @@ function Tshirt() {
   const [neckColor, setNeckColor] = useState('#ffffff');
   const [display, setDisplay] = useState('none');
   const [texture, setTexture] = useState("./textures/wawa.png");
-  const [position, setPosition] = useState([0, 0, 0]);
+  const [position, setPosition] = useState([0, 1.4, 0]);
   const [rotation, setRotation] = useState([0, 0, 0]);
-  const [scale, setScale] = useState([0, 0, 0]);
+  const [scale, setScale] = useState([0.3, 0.3, 0.3]);
   const partSelected = ['mesh', 'arm', 'neck'];
   const [selectedIndex, setSelectedIndex] = useState(0);
   const [modelLoaded, setModelLoaded] = useState(false);
+  const [close, setClose] = useState(true);
   const canvasRef = useRef(null);
 
   const getBackgroundSize = (value, min, max) => {
@@ -80,6 +83,16 @@ function Tshirt() {
 
   const handlePartChange = (index) => {
     setSelectedIndex(index);
+  };
+
+  const handleClose = () => {
+    if(close==true){
+      setDisplay("none");
+      setClose(false);
+    }else{
+      setDisplay("flex");
+      setClose(true);
+    }
   };
 
   const handleColorChange = (color) => {
@@ -107,7 +120,6 @@ function Tshirt() {
       const reader = new FileReader();
       reader.onload = () => {
         if(texture!==reader.result){
-          setScale([1,1,1]);
           setDisplay("flex");
         }
         setTexture(reader.result);
@@ -255,7 +267,7 @@ function Tshirt() {
   />
 </button>
       </div>
-      <div style={{ backgroundColor:"white", borderRadius:360, position: 'absolute', bottom: '10%', right: '5%', }}>
+      <div style={{ backgroundColor:"white", borderRadius:360, position: 'absolute', bottom: '20%', right: '5%', }}>
       <button 
   style={{ 
     display: "flex",
@@ -278,6 +290,7 @@ function Tshirt() {
   />
 </button>
       </div>
+      ({isMobile && texture!="./textures/wawa.png"  && <div style={{position: 'absolute',top: '35%',left: '5%' ,width:'50px',height:'50px'}}> <button onClick={handleClose}><img src={close ? closeimage:open }></img></button> </div> })
       <div style={{display:display,     position: 'absolute',      top: isMobile? '40%':'90%',
           left: '10%', flexDirection: isMobile?'column':'row',gap: isMobile?'5px':'150px'}}>
             <div>
@@ -300,14 +313,14 @@ function Tshirt() {
               <input
                 type="range"
                 id="posY"
-                min={1}
+                min={0}
                 max={3}
                 step={0.01}
                 value={position[1]}
                 onChange={handleSliderChange((value) =>
                   setPosition((prev) => [prev[0], value, prev[2]])
                 )}
-                style={getBackgroundSize(position[1],1,3)}
+                style={getBackgroundSize(position[1],0,3)}
               />
             </div>
             <div>
@@ -330,14 +343,14 @@ function Tshirt() {
               <input
                 type="range"
                 id="scale"
-                min={0.1}
+                min={0}
                 max={5}
                 step={0.01}
                 value={scale[0]}
                 onChange={handleSliderChange((value) =>
                   setScale([value, value, value])
                 )}
-                style={getBackgroundSize(scale[0],0.1,5)}
+                style={getBackgroundSize(scale[0],0,5)}
               />
             </div>
         </div>

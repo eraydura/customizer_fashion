@@ -7,6 +7,8 @@ import {
   useGLTF,
   useTexture
 } from '@react-three/drei';
+import open from '../assets/open.png';
+import closeimage from '../assets/close.png';
 import share from '../assets/share.png';
 import souls from '../assets/soul.png';
 import meshs from '../assets/mesh.png';
@@ -90,7 +92,7 @@ export function Shoe({ onModelLoad, ...props }) {
               scale={props.customColors.scale} // Scale of the decal
             >
 
-               <meshStandardMaterial
+              <meshPhongMaterial transparent 
                 map={useTexture(props.customColors.texture)}
                 normalMap={useTexture("./textures/fabric.png")}
                 toneMapped={true}
@@ -119,13 +121,23 @@ function Shoes() {
   const partSelected = ['mesh', 'stripes', 'soul'];
   const [selectedIndex, setSelectedIndex] = useState(0);
   const [modelLoaded, setModelLoaded] = useState(false);
+  const [close, setClose] = useState(true);
   const canvasRef = useRef(null);
 
   const getBackgroundSize = (value, min, max) => {
     return { backgroundSize: `${((value - min) * 100) / (max - min)}% 100%` };
   };
 
-
+  const handleClose = () => {
+    if(close==true){
+      setDisplay("none");
+      setClose(false);
+    }else{
+      setDisplay("flex");
+      setClose(true);
+    }
+  };
+  
   const handleModelLoad = () => {
     setModelLoaded(true);
     console.log(modelLoaded);
@@ -310,7 +322,7 @@ function Shoes() {
   />
 </button>
       </div>
-      <div style={{ backgroundColor:"white",borderRadius:360,position: 'absolute', bottom: '10%', right: '5%' }}>
+      <div style={{ backgroundColor:"white",borderRadius:360,position: 'absolute', bottom: '20%', right: '5%' }}>
       <button 
   style={{ 
     display: "flex",
@@ -333,6 +345,7 @@ function Shoes() {
   />
 </button>
       </div>
+      ({isMobile && texture!="./textures/wawa.png"  && <div style={{position: 'absolute',top: '35%',left: '5%' ,width:'50px',height:'50px'}}> <button onClick={handleClose}><img src={close ? closeimage:open }></img></button> </div> })
       <div style={{display:display,     position: 'absolute',      top: isMobile? '40%':'90%',
           left: '10%', flexDirection: isMobile?'column':'row',gap: isMobile?'5px':'150px'}}>
             <div>

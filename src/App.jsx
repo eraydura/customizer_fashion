@@ -6,7 +6,7 @@ import Dress from './components/Dress';
 import Cap from './components/Cap';
 import Tshirt from './components/Tshirt';
 import Choosen from './components/Choosen';
-import Home from './components/Home';
+import Text from './components/Text';
 import Hoodie from './components/Hoodie';
 
 const App = () => {
@@ -20,7 +20,7 @@ const App = () => {
           <Route exact path="/Tshirt" element={<Tshirt/>}/>
           <Route exact path="/choosen" element={<Choosen/>}/>
           <Route exact path="/hoodie" element={<Hoodie/>}/>
-          <Route exact path="/" element={<Home/>}/>
+          <Route exact path="/home" element={<Text/>}/>
         </Routes>
     </Router>
   );

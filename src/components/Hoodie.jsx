@@ -11,6 +11,8 @@ import share from '../assets/share.png';
 import souls from '../assets/3.png';
 import meshs from '../assets/1.png';
 import stripeimage from '../assets/2.png';
+import open from '../assets/open.png';
+import closeimage from '../assets/close.png';
 import icon from '../assets/image.png';
 import { degToRad } from "three/src/math/MathUtils.js";
 import {isMobile} from 'react-device-detect';
@@ -35,7 +37,7 @@ export function HoodieMesh({ onModelLoad, ...props }) {
               scale={props.customColors.scale} // Scale of the decal
             >
 
-               <meshStandardMaterial
+              <meshPhongMaterial transparent 
                 map={useTexture(props.customColors.texture)}
                 toneMapped={true}
                 polygonOffset
@@ -59,13 +61,24 @@ function Hoodie() {
   const [soulColor, setSoulColor] = useState('#ffffff');
   const [display, setDisplay] = useState('none');
   const [texture, setTexture] = useState("./textures/wawa.png");
-  const [position, setPosition] = useState([0, 80, 0]);
+  const [position, setPosition] = useState([0, 140, 0]);
   const [rotation, setRotation] = useState([0, 0, 0]);
   const [scale, setScale] = useState([0, 0, 0]);
   const partSelected = ['mesh', 'stripes', 'soul'];
   const [selectedIndex, setSelectedIndex] = useState(0);
   const [modelLoaded, setModelLoaded] = useState(false);
+  const [close, setClose] = useState(true);
   const canvasRef = useRef(null);
+
+  const handleClose = () => {
+    if(close==true){
+      setDisplay("none");
+      setClose(false);
+    }else{
+      setDisplay("flex");
+      setClose(true);
+    }
+  };
 
   const getBackgroundSize = (value, min, max) => {
     return { backgroundSize: `${((value - min) * 100) / (max - min)}% 100%` };
@@ -254,7 +267,7 @@ function Hoodie() {
 </button>
       </div>
 
-      <div style={{ backgroundColor:"white",borderRadius:360,position: 'absolute', bottom: '10%', right: '5%' }}>
+      <div style={{ backgroundColor:"white",borderRadius:360,position: 'absolute', bottom: '20%', right: '5%' }}>
       <button 
   style={{ 
     display: "flex",
@@ -277,7 +290,7 @@ function Hoodie() {
   />
 </button>
       </div>
-
+      ({isMobile && texture!="./textures/wawa.png"  && <div style={{position: 'absolute',top: '35%',left: '5%' ,width:'50px',height:'50px'}}> <button onClick={handleClose}><img src={close ? closeimage:open }></img></button> </div> })
       <div style={{display:display,     position: 'absolute',      top: isMobile? '40%':'90%',
           left: '10%', flexDirection: isMobile?'column':'row',gap: isMobile?'5px':'150px'}}>
             <div>
