@@ -1,4 +1,4 @@
-import React, { useState,useRef } from 'react';
+import React, { useState,useRef,useEffect } from 'react';
 import { Canvas } from '@react-three/fiber';
 import {
   Environment,
@@ -7,6 +7,7 @@ import {
   useGLTF,
   useTexture
 } from '@react-three/drei';
+import text from '../assets/text.png';
 import open from '../assets/open.png';
 import closeimage from '../assets/close.png';
 import share from '../assets/share.png';
@@ -16,6 +17,7 @@ import stripeimage from '../assets/stripes.png';
 import icon from '../assets/image.png';
 import { degToRad } from "three/src/math/MathUtils.js";
 import {isMobile} from 'react-device-detect';
+import AddTextureModal from './Text';
 
 export function Shoe({ onModelLoad, ...props }) {
   const { nodes, materials,scene } = useGLTF("/models/shoes/shoe.gltf");
@@ -123,6 +125,22 @@ function Shoes() {
   const [modelLoaded, setModelLoaded] = useState(false);
   const [close, setClose] = useState(true);
   const canvasRef = useRef(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
+  const handleAddTexture = () => {
+    setIsModalOpen(true);
+  };
+
+  const handleModalClose = () => {
+    setIsModalOpen(false);
+  };
+
+  const handleOkModal = (generatedTexture) => {
+    setScale([5,5,5]);
+    setDisplay("flex");
+    handleModalClose();
+    setTexture(generatedTexture);
+  };
 
   const getBackgroundSize = (value, min, max) => {
     return { backgroundSize: `${((value - min) * 100) / (max - min)}% 100%` };
@@ -322,6 +340,11 @@ function Shoes() {
   />
 </button>
       </div>
+      <div style={{backgroundColor:"white", borderRadius:360,position: 'absolute',top: '25%',right: '5%' ,    width: !isMobile ? '100px' : '60px', height: !isMobile ? '100px' : '60px'}}> <button onClick={handleAddTexture}><img src={text}></img></button> </div> 
+
+{isModalOpen && (
+  <AddTextureModal onClose={handleModalClose} onOk={handleOkModal} />
+)}
       <div style={{ backgroundColor:"white",borderRadius:360,position: 'absolute', bottom: '20%', right: '5%' }}>
       <button 
   style={{ 

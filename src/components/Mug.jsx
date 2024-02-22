@@ -1,4 +1,4 @@
-import React, { useState,useRef } from 'react';
+import React, { useState,useRef,useEffect } from 'react';
 import { Canvas } from '@react-three/fiber';
 import {
   Environment,
@@ -7,14 +7,17 @@ import {
   useGLTF,
   useTexture
 } from '@react-three/drei';
+import text from '../assets/text.png';
 import share from '../assets/share.png';
 import open from '../assets/open.png';
 import closeimage from '../assets/close.png';
 import icon from '../assets/image.png';
 import { degToRad } from "three/src/math/MathUtils.js";
 import {isMobile} from 'react-device-detect';
+import '../index.css'; 
+import AddTextureModal from './Text';
 
-export function Shoe({ onModelLoad, ...props }) {
+export function Shoe({ onModelLoad, customColors, ...props }) {
   const { nodes, materials,scene } = useGLTF("/models/mug.glb");
   // Notify parent component when model is loaded
   React.useEffect(() => {
@@ -26,24 +29,29 @@ export function Shoe({ onModelLoad, ...props }) {
     <group  {...props} dispose={null}>
       <group position={[0, -0.5, 0]} scale={0.3}>
         <mesh      material-metalness={0.5}
-      material-roughness={0.5} geometry={nodes.Arc001_1002.geometry} material={materials['01___Default-2.002']} material-color={props.customColors.mesh} />
+      material-roughness={0.5} geometry={nodes.Arc001_1002.geometry} material={materials['01___Default-2.002']} material-color={customColors.mesh} />
         <mesh      material-metalness={0.5}
-      material-roughness={0.5} geometry={nodes.Arc001_1002_1.geometry} material={materials['02___Default-2.002']} material-color={props.customColors.mesh} />
+      material-roughness={0.5} geometry={nodes.Arc001_1002_1.geometry} material={materials['02___Default-2.002']} material-color={customColors.mesh} />
         <mesh      material-metalness={0.5}
-      material-roughness={0.5} geometry={nodes.Arc001_1002_2.geometry} material={materials['02___Default.002']} material-color={props.customColors.mesh} />
+      material-roughness={0.5} geometry={nodes.Arc001_1002_2.geometry} material={materials['02___Default.002']} material-color={customColors.mesh} />
         <mesh      material-metalness={0.5}
-      material-roughness={0.5} geometry={nodes.Arc001_1002_3.geometry} material={materials['01___Default.002']} material-color={props.customColors.mesh} />
-<mesh geometry={nodes.Arc001_1002_4.geometry} material={materials['printable.002']}>
-
+      material-roughness={0.5} geometry={nodes.Arc001_1002_3.geometry} material={materials['01___Default.002']} material-color={customColors.mesh} />
+<mesh geometry={nodes.Arc001_1002_4.geometry} >
+<meshBasicMaterial transparent opacity={0} />
             <Decal
               // debug // Makes "bounding box" of the decal visible
-              position={props.customColors.pos} // Position of the decal
-              rotation={props.customColors.rotation} // Rotation of the decal (can be a vector or a degree in radians)
-              scale={props.customColors.scale} // Scale of the decal
+              position={customColors.pos} // Position of the decal
+              rotation={customColors.rotation} // Rotation of the decal (can be a vector or a degree in radians)
+              scale={customColors.scale} // Scale of the decal
             >
-
-            <meshPhongMaterial transparent 
-                map={useTexture(props.customColors.texture)}
+              <meshBasicMaterial transparent 
+                map={useTexture("./textures/fabric_ao.png")}
+                toneMapped={true}
+                polygonOffset
+                polygonOffsetFactor={-1} // The mesh should take precedence over the original
+              />
+            <meshBasicMaterial transparent 
+                map={useTexture(customColors.texture)}
                 toneMapped={true}
                 polygonOffset
                 polygonOffsetFactor={-1} // The mesh should take precedence over the original
@@ -61,13 +69,29 @@ export function Shoe({ onModelLoad, ...props }) {
 function Mug() {
   const [meshColor, setMeshColor] = useState('#ffffff');
   const [display, setDisplay] = useState('none');
-  const [texture, setTexture] = useState("./textures/wawa.png");
   const [position, setPosition] = useState([0, 1, 0]);
+  const [texture, setTexture] = useState("./textures/wawa.png");
   const [rotation, setRotation] = useState([0, 0, 0]);
   const [scale, setScale] = useState([0, 0, 0]);
   const [modelLoaded, setModelLoaded] = useState(false);
   const [close, setClose] = useState(true);
   const canvasRef = useRef(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
+  const handleAddTexture = () => {
+    setIsModalOpen(true);
+  };
+
+  const handleModalClose = () => {
+    setIsModalOpen(false);
+  };
+
+  const handleOkModal = (generatedTexture) => {
+    setScale([5,5,5]);
+    setDisplay("flex");
+    handleModalClose();
+    setTexture(generatedTexture);
+  };
 
   const getBackgroundSize = (value, min, max) => {
     return { backgroundSize: `${((value - min) * 100) / (max - min)}% 100%` };
@@ -226,6 +250,11 @@ function Mug() {
   />
 </button>
       </div>
+      <div style={{backgroundColor:"white", borderRadius:360,position: 'absolute',top: '25%',right: '5%' ,    width: !isMobile ? '100px' : '60px', height: !isMobile ? '100px' : '60px'}}> <button onClick={handleAddTexture}><img src={text}></img></button> </div> 
+
+      {isModalOpen && (
+        <AddTextureModal onClose={handleModalClose} onOk={handleOkModal} />
+      )}
       ({isMobile && texture!="./textures/wawa.png"  && <div style={{position: 'absolute',top: '35%',left: '5%' ,width:'50px',height:'50px'}}> <button onClick={handleClose}><img src={close ? closeimage:open }></img></button> </div> })
       <div style={{display:display,     position: 'absolute',      top: isMobile? '40%':'90%',
           left: '10%', flexDirection: isMobile?'column':'row',gap: isMobile?'5px':'150px'}}>
@@ -279,14 +308,14 @@ function Mug() {
               <input
                 type="range"
                 id="scale"
-                min={0.1}
-                max={5}
+                min={4}
+                max={10}
                 step={0.01}
                 value={scale[0]}
                 onChange={handleSliderChange((value) =>
                   setScale([value, value, value])
                 )}
-                style={getBackgroundSize(scale[0],0.1,5)}
+                style={getBackgroundSize(scale[0],3,10)}
               />
             </div>
         </div>

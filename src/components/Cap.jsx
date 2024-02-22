@@ -7,6 +7,7 @@ import {
   useGLTF,
   useTexture
 } from '@react-three/drei';
+import text from '../assets/text.png';
 import down from '../assets/cap_down.png';
 import up from '../assets/cap_up.png';
 import icon from '../assets/image.png';
@@ -16,6 +17,7 @@ import share from '../assets/share.png';
 import { degToRad } from "three/src/math/MathUtils.js";
 import {isMobile} from 'react-device-detect';
 import '../index.css';
+import AddTextureModal from './Text';
 
 export function CapMesh({ onModelLoad, ...props }) {
   const { nodes, materials, scene } = useGLTF("/models/baseball_cap.glb");
@@ -95,7 +97,26 @@ function Cap() {
   const [modelLoaded, setModelLoaded] = useState(false);
   const [close, setClose] = useState(false);
   const canvasRef = useRef(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
+  const handleAddTexture = () => {
+    setIsModalOpen(true);
+  };
+
+  const handleModalClose = () => {
+    setIsModalOpen(false);
+  };
+
+  const handleOkModal = (generatedTexture) => {
+    setDisplay("flex");
+    if(selectedIndex==0){
+      setUpTexture(generatedTexture);
+    }else{
+      setDownTexture(generatedTexture);
+    }
+  };
+
+  
   const getBackgroundSize = (value, min, max) => {
     return { backgroundSize: `${((value - min) * 100) / (max - min)}% 100%` };
   };
@@ -201,6 +222,21 @@ function Cap() {
       link.href = dataURL;
       link.download = 'canvas_image.png';
       link.click();
+    }
+  };
+  const handleShare = async () => {
+    const canvas = canvasRef.current;
+    if (canvas && navigator.share) {
+      try {
+        const dataURL = canvas.toDataURL();
+        await navigator.share({
+          title: 'Shared Image',
+          text: 'Check out this image!',
+          url: dataURL,
+        });
+      } catch (error) {
+        console.error('Error sharing image:', error);
+      }
     }
   };
 
@@ -323,7 +359,7 @@ function Cap() {
     width: !isMobile ? '100px' : '60px', 
     height: !isMobile ? '100px' : '60px'
   }} 
-  onClick={saveCanvasAsImage}
+  onClick={isMobile?  handleShare : saveCanvasAsImage}
 >
   <img 
     src={share} 
@@ -335,6 +371,11 @@ function Cap() {
   />
 </button>
       </div>
+      <div style={{backgroundColor:"white", borderRadius:360,position: 'absolute',top: '25%',right: '5%' ,    width: !isMobile ? '100px' : '60px', height: !isMobile ? '100px' : '60px'}}> <button onClick={handleAddTexture}><img src={text}></img></button> </div> 
+
+      {isModalOpen && (
+        <AddTextureModal onClose={handleModalClose} onOk={handleOkModal} />
+      )}
        ({isMobile && (uptexture!="./textures/wawa.png" || downtexture!="./textures/wawa.png" ) && <div style={{display:display2,position: 'absolute',top: '35%',left: '5%' ,width:'50px',height:'50px'}}> <button onClick={handleClose}><img src={close ? closeimage:open }></img></button> </div> })
        <div style={{display:display,     position: 'absolute',      top: isMobile? '40%':'90%',
           left: '10%', flexDirection: isMobile?'column':'row',gap: isMobile?'5px':'150px'}}>

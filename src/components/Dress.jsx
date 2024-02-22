@@ -1,4 +1,4 @@
-import React, { useState,useRef } from 'react';
+import React, { useState,useRef,useEffect } from 'react';
 import { Canvas } from '@react-three/fiber';
 import {
   Environment,
@@ -7,6 +7,7 @@ import {
   useGLTF,
   useTexture
 } from '@react-three/drei';
+import text from '../assets/text.png';
 import share from '../assets/share.png';
 import down from '../assets/down.png';
 import up from '../assets/up.png';
@@ -15,6 +16,7 @@ import closeimage from '../assets/close.png';
 import icon from '../assets/image.png';
 import { degToRad } from "three/src/math/MathUtils.js";
 import {isMobile} from 'react-device-detect';
+import AddTextureModal from './Text';
 
 export function DDress({ onModelLoad, ...props }) {
   const { nodes, materials,scene } = useGLTF("/models/dress.glb");
@@ -74,7 +76,6 @@ export function DDress({ onModelLoad, ...props }) {
     </group>
   )
 }
-
 function Dress() {
   const [upColor, setUpColor] = useState('#ffffff');
   const [downColor, setDownColor] = useState('#ffffff');
@@ -93,6 +94,27 @@ function Dress() {
   const [modelLoaded, setModelLoaded] = useState(false);
   const [close, setClose] = useState(false);
   const canvasRef = useRef(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
+  const handleAddTexture = () => {
+    setIsModalOpen(true);
+  };
+
+  const handleModalClose = () => {
+    setIsModalOpen(false);
+  };
+
+  const handleOkModal = (generatedTexture) => {
+    setScale([35,35,35]);
+    setDisplay("flex");
+    handleModalClose();
+    if(selectedIndex==0){
+      setUpTexture(generatedTexture);
+    }else{
+      setDownTexture(generatedTexture);
+    }
+
+  };
 
   const handleClose = () => {
     if(close==true){
@@ -105,7 +127,7 @@ function Dress() {
   };
 
   const getBackgroundSize = (value, min, max) => {
-    return { backgroundSize: `${((value - min) * 100) / (max - min)}% 100%` };
+    return { backgroundSize: `${((value - (min)) * 100) / (max  - ( min))}% 100%` };
   };
 
   const handleModelLoad = () => {
@@ -320,6 +342,11 @@ function Dress() {
   />
 </button>
       </div>
+      <div style={{backgroundColor:"white", borderRadius:360,position: 'absolute',top: '25%',right: '5%' ,    width: !isMobile ? '100px' : '60px', height: !isMobile ? '100px' : '60px'}}> <button onClick={handleAddTexture}><img src={text}></img></button> </div> 
+
+      {isModalOpen && (
+        <AddTextureModal onClose={handleModalClose} onOk={handleOkModal} />
+      )}
       ({isMobile && (uptexture!="./textures/wawa.png" || downtexture!="./textures/wawa.png" ) && <div style={{display:display2,position: 'absolute',top: '35%',left: '5%' ,width:'50px',height:'50px'}}> <button onClick={handleClose}><img src={close ? closeimage:open }></img></button> </div> })
       <div style={{display:display,     position: 'absolute',      top: isMobile? '40%':'90%',
           left: '10%', flexDirection: isMobile?'column':'row',gap: isMobile?'5px':'150px'}}>
@@ -343,14 +370,14 @@ function Dress() {
               <input
                 type="range"
                 id="posY"
-                min={90}
-                max={150}
+                min={selectedIndex ==0 ? 90 :50}
+                max={selectedIndex ==0 ?  150 :100}
                 step={0.01}
                 value={selectedIndex==0 ? position[1]: position2[1]}
                 onChange={handleSliderChange((value) =>
                   selectedIndex==0 ? setPosition((prev) => [prev[0], value, prev[2]]) : setPosition2((prev) => [prev[0], value, prev[2]])
                 )}
-                style={getBackgroundSize(selectedIndex==0 ? position[1]: position2[1],90,150)}
+                style={getBackgroundSize(selectedIndex==0 ? position[1]: position2[1],selectedIndex ==0 ?90 :50,selectedIndex ==0 ?150:100)}
               />
             </div>
             <div>
@@ -373,14 +400,14 @@ function Dress() {
               <input
                 type="range"
                 id="scale"
-                min={0}
+                min={35}
                 max={100}
                 step={0.01}
                 value={selectedIndex==0 ? scale[0]: scale2[0]}
                 onChange={handleSliderChange((value) =>
                   selectedIndex==0 ?  setScale([value, value, value]) : setScale2([value, value, value])
                 )}
-                style={getBackgroundSize(selectedIndex==0 ? scale[0]: scale2[0],0,100)}
+                style={getBackgroundSize(selectedIndex==0 ? scale[0]: scale2[0],35,100)}
               />
             </div>
         </div>

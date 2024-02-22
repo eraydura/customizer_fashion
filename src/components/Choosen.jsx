@@ -5,6 +5,7 @@ import { OrbitControls, useGLTF } from "@react-three/drei";
 import { FaChevronLeft, FaChevronRight } from "react-icons/fa";
 import { useNavigate } from 'react-router-dom';
 import { isMobile } from "react-device-detect";
+import '../index.css';
 
 const modelPaths = [
   "/models/baseball_cap.glb",
@@ -108,13 +109,23 @@ export default function Choosen() {
           </div>
         )}
         {!loading && (
-          <div style={{ position: "absolute", left: isMobile? "10%": "25%" , top: "10%", color: "white" }}>
-            {isMobile ? (
-              <h1>WHICH ONE DO YOU <p>WANT TO CREATE?</p></h1>
-            ) : (
-              <h1>WHICH ONE DO YOU WANT TO CREATE?</h1>
-            )}
-          </div>
+          <div style={{ 
+              textAlign: 'center', // Center align the text
+              position: 'absolute', 
+              left: isMobile ? '5%' : '20%', 
+              top: '10%', 
+              color: 'white' 
+            }}>
+              {isMobile ? (
+                <h3 style={{ textAlign: 'center', fontSize: '15px', fontFamily: "'Vipnagorgialla', sans-serif" }}>
+                  WHICH ONE DO YOU WANT TO CREATE?
+                </h3>
+              ) : (
+                <h1 style={{ fontSize: '35px', fontFamily: "'Vipnagorgialla', sans-serif" }}>
+                  WHICH ONE DO YOU WANT TO CREATE?
+                </h1>
+              )}
+            </div>
         )}
       </div>
       {!loading && (

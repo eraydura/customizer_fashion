@@ -1,4 +1,4 @@
-import React, { useState,useRef } from 'react';
+import React, { useState,useRef,useEffect } from 'react';
 import { Canvas } from '@react-three/fiber';
 import {
   Environment,
@@ -7,6 +7,7 @@ import {
   useGLTF,
   useTexture
 } from '@react-three/drei';
+import text from '../assets/text.png';
 import share from '../assets/share.png';
 import souls from '../assets/3.png';
 import meshs from '../assets/1.png';
@@ -16,6 +17,7 @@ import closeimage from '../assets/close.png';
 import icon from '../assets/image.png';
 import { degToRad } from "three/src/math/MathUtils.js";
 import {isMobile} from 'react-device-detect';
+import AddTextureModal from './Text';
 
 export function HoodieMesh({ onModelLoad, ...props }) {
   const { nodes, materials ,scene} = useGLTF("/models/hoodie.glb");
@@ -69,6 +71,23 @@ function Hoodie() {
   const [modelLoaded, setModelLoaded] = useState(false);
   const [close, setClose] = useState(true);
   const canvasRef = useRef(null);
+
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
+  const handleAddTexture = () => {
+    setIsModalOpen(true);
+  };
+
+  const handleModalClose = () => {
+    setIsModalOpen(false);
+  };
+
+  const handleOkModal = (generatedTexture) => {
+    setScale([1,1,1]);
+    setDisplay("flex");
+    handleModalClose();
+    setTexture(generatedTexture);
+  };
 
   const handleClose = () => {
     if(close==true){
@@ -289,7 +308,13 @@ function Hoodie() {
     }} 
   />
 </button>
+
       </div>
+      <div style={{backgroundColor:"white", borderRadius:360,position: 'absolute',top: '25%',right: '5%' ,    width: !isMobile ? '100px' : '60px', height: !isMobile ? '100px' : '60px'}}> <button onClick={handleAddTexture}><img src={text}></img></button> </div> 
+
+{isModalOpen && (
+        <AddTextureModal onClose={handleModalClose} onOk={handleOkModal} />
+      )}
       ({isMobile && texture!="./textures/wawa.png"  && <div style={{position: 'absolute',top: '35%',left: '5%' ,width:'50px',height:'50px'}}> <button onClick={handleClose}><img src={close ? closeimage:open }></img></button> </div> })
       <div style={{display:display,     position: 'absolute',      top: isMobile? '40%':'90%',
           left: '10%', flexDirection: isMobile?'column':'row',gap: isMobile?'5px':'150px'}}>

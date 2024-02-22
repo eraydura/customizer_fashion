@@ -6,7 +6,7 @@ import Dress from './components/Dress';
 import Cap from './components/Cap';
 import Tshirt from './components/Tshirt';
 import Choosen from './components/Choosen';
-import Text from './components/Text';
+import Error from './components/Error.jsx';
 import Hoodie from './components/Hoodie';
 
 const App = () => {
@@ -18,9 +18,9 @@ const App = () => {
           <Route exact path="/dress" element={<Dress/>}/>
           <Route exact path="/cap" element={<Cap/>}/>
           <Route exact path="/Tshirt" element={<Tshirt/>}/>
-          <Route exact path="/choosen" element={<Choosen/>}/>
+          <Route exact path="/" element={<Choosen/>}/>
           <Route exact path="/hoodie" element={<Hoodie/>}/>
-          <Route exact path="/home" element={<Text/>}/>
+          <Route path="*" element={<Error />} />
         </Routes>
     </Router>
   );
