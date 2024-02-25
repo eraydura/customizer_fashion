@@ -18,6 +18,8 @@ import { degToRad } from "three/src/math/MathUtils.js";
 import {isMobile} from 'react-device-detect';
 import '../index.css';
 import AddTextureModal from './Text';
+import * as utils from './utils.jsx';
+import * as styles from './style.jsx';
 
 export function CapMesh({ onModelLoad, ...props }) {
   const { nodes, materials, scene } = useGLTF("/models/baseball_cap.glb");
@@ -99,100 +101,28 @@ function Cap() {
   const canvasRef = useRef(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
-  const handleAddTexture = () => {
-    setIsModalOpen(true);
-  };
-
-  const handleModalClose = () => {
-    setIsModalOpen(false);
-  };
-
   const handleOkModal = (generatedTexture) => {
     setDisplay("flex");
     if(selectedIndex==0){
+      setDisplay2(true);
+      setClose(true);
       setUpTexture(generatedTexture);
     }else{
+      setDisplay2(true);
+      setClose(true);
       setDownTexture(generatedTexture);
     }
   };
 
-  
-  const getBackgroundSize = (value, min, max) => {
-    return { backgroundSize: `${((value - min) * 100) / (max - min)}% 100%` };
+  const lock = {
+    display: display2,
+    position: 'absolute',
+    top: '35%',
+    left: '5%' ,
+    width:'50px',
+    height:'50px'
   };
 
-  const handleModelLoad = () => {
-    setModelLoaded(true);
-    console.log(modelLoaded);
-  };
-
-  const handleClose = () => {
-    if(close==true){
-      setDisplay("none");
-      setClose(false);
-    }else{
-      setDisplay("flex");
-      setClose(true);
-    }
-  };
-
-
-  const handlePartChange = (index) => {
-    if(index==0 && uptexture=="./textures/wawa.png"){
-      setDisplay("none");
-      setClose(false);
-      setDisplay2("none");
-    }else if(index==1 && downtexture=="./textures/wawa.png"){
-      setDisplay("none");
-      setClose(false);
-      setDisplay2("none");
-    }
-    setSelectedIndex(index);
-  };
-
-  const handleColorChange = (color) => {
-    switch (partSelected[selectedIndex]) {
-      case 'up':
-        setUpColor(color);
-        break;
-      case 'down':
-        setDownColor(color);
-        break;
-      default:
-        break;
-    }
-  };
-
-  const galleryOpen = () => {
-    const input = document.createElement('input');
-    input.type = 'file';
-    input.accept = 'image/*';
-    input.onchange = (event) => {
-      const file = event.target.files[0];
-      const reader = new FileReader();
-      reader.onload = () => {
-        if(uptexture!==reader.result&&selectedIndex==0){
-          setDisplay("flex");
-          setClose(true);
-          setDisplay2("block");
-          setUpTexture(reader.result);
-        }else if(downtexture!==reader.result&&selectedIndex==1){
-          setDisplay("flex");
-          setClose(true);
-          setDisplay2("block");
-          setDownTexture(reader.result);
-        }
-      };
-      reader.readAsDataURL(file);
-    };
-    input.click();
-  };
-
-  const handleSliderChange = (setter) => (event) => {
-    setter(parseFloat(event.target.value));
-  };
-
-  const BUTTON_HEIGHT = 20;
   const dropdownStyle = {
     position: 'absolute',
     top: '10%',
@@ -202,6 +132,7 @@ function Cap() {
     justifyContent: 'flex-start',
     alignItems: 'flex-start',
   };
+  
   const dropdownStyle2 = {
     position: 'absolute',
     top: '3%',
@@ -210,59 +141,25 @@ function Cap() {
     flexDirection: 'row',
     justifyContent: 'center',
     alignItems: 'center',
-    width: '80%', // Adjust the width as needed
+    width: '80%', 
     margin: '0 auto', 
   };
 
-  const saveCanvasAsImage = () => {
-    const canvas = canvasRef.current;
-    if (canvas) {
-      const dataURL = canvas.toDataURL();
-      const link = document.createElement('a');
-      link.href = dataURL;
-      link.download = 'canvas_image.png';
-      link.click();
-    }
-  };
-  const handleShare = async () => {
-    const canvas = canvasRef.current;
-    if (canvas && navigator.share) {
-      try {
-        const dataURL = canvas.toDataURL();
-        await navigator.share({
-          title: 'Shared Image',
-          text: 'Check out this image!',
-          url: dataURL,
-        });
-      } catch (error) {
-        console.error('Error sharing image:', error);
-      }
-    }
-  };
-
-  // Calculate the gap dynamically based on the number of children elements
-  const calculateDynamicGap = (containerHeight, numChildren) => {
-    const totalGap = containerHeight - (numChildren * BUTTON_HEIGHT); // Assuming BUTTON_HEIGHT is constant
-    return totalGap / (numChildren - 1);
-  };
-  
-  // Usage example
   const containerHeight = 200; // Example container height
   const numChildren = 3; // Example number of children
-  const dynamicGap = calculateDynamicGap(containerHeight, numChildren);
+  const dynamicGap = utils.calculateDynamicGap(containerHeight, numChildren);
   dropdownStyle.gap = dynamicGap + 'px';
   dropdownStyle2.gap = dynamicGap + 'px';
 
-
   return (
-    <div style={{ overflow:"hidden", width: '100vw', height: '100vh', position: 'relative',backgroundColor: 'black' }}>
+    <div style={styles.body}>
       <Canvas gl={{ preserveDrawingBuffer: true }}  ref={canvasRef} shadows camera={{ position: [3, 3, 3], fov: 30 }}>
         <color attach="background" args={['#ececec']} />
         <OrbitControls />
         <Environment preset="sunset" background blur={4} />
         <ambientLight />
         <CapMesh
-          onModelLoad={handleModelLoad}
+          onModelLoad={()=>utils.handleModelLoad(setModelLoaded)}
           customColors={{
             up: upColor,
             down: downColor,
@@ -278,108 +175,92 @@ function Cap() {
         />
       </Canvas>
 
-     ({modelLoaded ? <div >
-      ({isMobile ? <div>
-        <input
-          type="color"
-          style={{ position: 'absolute',top: '10%',left: '20px', width: '50px', height: '50px'}}
-          value={partSelected[selectedIndex] === 'up' ? upColor :  downColor }
-          onChange={(e) => handleColorChange(e.target.value)}
-        />
-        <div style={dropdownStyle2}>
-        {partSelected.map((part, index) => (
-          <button 
-            style={{ 
-              borderRadius: 360,
-              border:0,
-              width: '60px', 
-              height: '60px',
-              backgroundColor: part === partSelected[selectedIndex] ? "green" : "transparent" // Apply green border if selected, otherwise no border
-            }} 
-            key={index} 
-            onClick={() => handlePartChange(index)}
-          >
-            <img src={part === 'up' ? up : down} alt={part} style={{ width: '100%', height: '100%' }} />
-          </button>
-        ))}
-        </div>
-      </div> : <div
-        style={dropdownStyle}
-      >
-        <input
-          type="color"
-          style={{ width:  '100px', height:  '100px'}}
-          value={partSelected[selectedIndex] === 'up' ? upColor :  downColor }
-          onChange={(e) => handleColorChange(e.target.value)}
-        />
-        {partSelected.map((part, index) => (
-          <button style={{ backgroundColor: part === partSelected[selectedIndex] ? "green" :"white",border:0, borderRadius:360, display: 'flex', justifyContent: 'center', alignItems: 'center' }} key={index} onClick={() => handlePartChange(index)}>
-           <img src={part === 'up' ? up : down} alt={part} style={{ width: '80px', height: '80px' }} />
-        </button>
-        ))}
-      </div> })
+     ({modelLoaded ? 
+     
+     <div>
 
-      <div
-        style={{
-          position: 'absolute',
-          top: '10%',
-          right: '5%',
-        }}
-      >
-<button 
-  style={{ 
-    backgroundColor: "white",
-    borderRadius: 360,
-    width: !isMobile ? '100px' : '60px', 
-    height: !isMobile ? '100px' : '60px',
-    display: "flex",
-    justifyContent: "center",
-    alignItems: "center"
-  }}  
-  onClick={galleryOpen}
->
-  <img 
-    src={icon} 
-    alt="gallery" 
-    style={{ 
-      width: !isMobile ? '50px' : '35px', 
-      height: !isMobile ? '50px' : '35px'
-    }} 
-  />
-</button>
+
+      {/* Color Button */}
+      ({isMobile ? 
+      
+              <div>
+                <input
+                  type="color"
+                  style={styles.colorPickerStyle}
+                  value={partSelected[selectedIndex] === 'up' ? upColor :  downColor }
+                  onChange={(e) => utils.handleColorChange(e.target.value,setDownColor,selectedIndex,partSelected,setUpColor)}
+                />
+                <div style={dropdownStyle2}>
+                {partSelected.map((part, index) => (
+                  <button 
+                    style={{ 
+                      borderRadius: 360,
+                      border:0,
+                      width: '60px', 
+                      height: '60px',
+                      backgroundColor: part === partSelected[selectedIndex] ? "green" : "transparent" 
+                    }} 
+                    key={index} 
+                    onClick={() => utils.handlePartChange(index,setDisplay,setClose,uptexture,setDisplay2,downtexture,setSelectedIndex)}
+                  >
+                    <img src={part === 'up' ? up : down} alt={part} style={{ width: '100%', height: '100%' }} />
+                  </button>
+                ))}
+                </div>
+              </div> 
+      
+      : 
+              <div style={dropdownStyle}>
+                  <input
+                    type="color"
+                    style={{ width:  '100px', height:  '100px'}}
+                    value={partSelected[selectedIndex] === 'up' ? upColor :  downColor }
+                    onChange={(e) => utils.handleColorChange(e.target.value,setDownColor,selectedIndex,partSelected,setUpColor)}
+                  />
+                  {partSelected.map((part, index) => 
+                    (
+                        <button style={{ backgroundColor: part === partSelected[selectedIndex] ? "green" :"white",border:0, borderRadius:360, display: 'flex', justifyContent: 'center', alignItems: 'center' }} key={index} onClick={() => utils.handlePartChange(index,setDisplay,setClose,uptexture,setDisplay2,downtexture,setSelectedIndex)}>
+                        <img src={part === 'up' ? up : down} alt={part} style={{ width: '80px', height: '80px' }} />
+                      </button>
+                    )
+                    )
+                  }
+              </div> 
+      })
+
+
+      {/* Gallery Button */}
+      <div style={styles.gallery}>
+            <button style={styles.galleryButtonStyle}  
+              onClick={()=>utils.galleryOpen(setDisplay,setClose,setDisplay2,setUpTexture,setDownTexture,downtexture,uptexture,selectedIndex)}
+            > <img src={icon} alt="gallery" style={styles.galleryButtonImageStyle} /></button>
       </div>
-      <div style={{ backgroundColor:"white",borderRadius:360,position: 'absolute', bottom: '20%', right: '5%' }}>
-      <button 
-  style={{ 
-    display: "flex",
-    justifyContent: "center",
-    alignItems: "center",
-    alignContent: "center",
-    borderRadius: 360,
-    width: !isMobile ? '100px' : '60px', 
-    height: !isMobile ? '100px' : '60px'
-  }} 
-  onClick={isMobile?  handleShare : saveCanvasAsImage}
->
-  <img 
-    src={share} 
-    alt="gallery" 
-    style={{ 
-      width: !isMobile ? '50px' : '35px', 
-      height: !isMobile ? '50px' : '35px'
-    }} 
-  />
-</button>
+
+      {/* Save Button */}
+      <div style={styles.save}>
+          <button style={styles.saveButtonStyle} onClick={() => utils.saveCanvasAsImage(canvasRef)}>
+            <img src={share} alt="gallery" style={styles.saveButtonImages} 
+          />
+          </button>
       </div>
-      <div style={{backgroundColor:"white", borderRadius:360,position: 'absolute',top: '25%',right: '5%' ,    width: !isMobile ? '100px' : '60px', height: !isMobile ? '100px' : '60px'}}> <button onClick={handleAddTexture}><img src={text}></img></button> </div> 
+
+
+
+      {/* Add Text Button */}
+      <div style={styles.addTextButtonStyle}> <button onClick={() => utils.handleAddTexture(setIsModalOpen)}><img src={text}></img></button> </div> 
 
       {isModalOpen && (
-        <AddTextureModal onClose={handleModalClose} onOk={handleOkModal} />
+        <AddTextureModal onClose={() => utils.handleModalClose(setIsModalOpen)} onOk={handleOkModal} />
       )}
-       ({isMobile && (uptexture!="./textures/wawa.png" || downtexture!="./textures/wawa.png" ) && <div style={{display:display2,position: 'absolute',top: '35%',left: '5%' ,width:'50px',height:'50px'}}> <button onClick={handleClose}><img src={close ? closeimage:open }></img></button> </div> })
-       <div style={{display:display,     position: 'absolute',      top: isMobile? '40%':'90%',
-          left: '10%', flexDirection: isMobile?'column':'row',gap: isMobile?'5px':'150px'}}>
- <div>
+
+       {/* Add Lock */}
+       ({isMobile && (uptexture!="./textures/wawa.png" || downtexture!="./textures/wawa.png" ) && 
+              <div style={lock}> <button onClick={()=>utils.handleClose(close,setClose,setDisplay)}><img src={close ? closeimage:open }></img></button> 
+       </div> })
+
+
+       {/* Sliders */}
+       <div style={{display:display,position: 'absolute',top: isMobile? '40%':'90%',left: '10%', flexDirection: isMobile?'column':'row',gap: isMobile?'5px':'150px'}}><div>
               <label htmlFor="posX">Position X</label>
               <input
                 type="range"
@@ -388,10 +269,10 @@ function Cap() {
                 max={10}
                 step={0.01}
                 value={selectedIndex==0 ? position[0] : position2[0]}
-                onChange={handleSliderChange((value) =>
+                onChange={utils.handleSliderChange((value) =>
                   selectedIndex==0 ? setPosition((prev) => [value, prev[1], prev[2]]) :setPosition2((prev) => [value, prev[1], prev[2]])
                 )}
-                style={getBackgroundSize(selectedIndex==0 ? position[0] : position2[0],-10,10)}
+                style={utils.getBackgroundSize(selectedIndex==0 ? position[0] : position2[0],-10,10)}
               />
             </div>
             <div>
@@ -403,10 +284,10 @@ function Cap() {
                 max={2}
                 step={0.01}
                 value={selectedIndex==0 ? position[1] : position2[1]}
-                onChange={handleSliderChange((value) =>
+                onChange={utils.handleSliderChange((value) =>
                   selectedIndex==0 ? setPosition((prev) => [prev[0], value, prev[2]]) : setPosition2((prev) => [prev[0], value, prev[2]])
                 )}
-                style={getBackgroundSize(selectedIndex==0 ? position[1] : position2[1],-2,2)}
+                style={utils.getBackgroundSize(selectedIndex==0 ? position[1] : position2[1],-2,2)}
               />
             </div>
             <div>
@@ -418,10 +299,10 @@ function Cap() {
                 max={Math.PI}
                 step={degToRad(1)}
                 value={selectedIndex==0 ? rotation[1] : rotation2[1]}
-                onChange={handleSliderChange((value) =>
+                onChange={utils.handleSliderChange((value) =>
                   selectedIndex==0 ?setRotation((prev) => [prev[0], value, prev[2]]): setRotation2((prev) => [prev[0], value, prev[2]])
                 )}
-                style={getBackgroundSize(selectedIndex==0 ? rotation[1] : rotation2[1],-Math.PI,Math.PI)}
+                style={utils.getBackgroundSize(selectedIndex==0 ? rotation[1] : rotation2[1],-Math.PI,Math.PI)}
               />
             </div>
             <div>
@@ -433,16 +314,22 @@ function Cap() {
                 max={5}
                 step={0.01}
                 value={selectedIndex==0 ? scale[0]: scale2[0]}
-                onChange={handleSliderChange((value) =>
+                onChange={utils.handleSliderChange((value) =>
                   selectedIndex==0 ?  setScale([value, value, value]) : setScale2([value, value, value])
                 )}
-                style={getBackgroundSize(selectedIndex==0 ? scale[0]: scale2[0],0,5)}
+                style={utils.getBackgroundSize(selectedIndex==0 ? scale[0]: scale2[0],0,5)}
               />
             </div>
         </div>
-     </div> : <div style={{ width: "100%", height: "100%" }}>
-  <div style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', color: 'white', padding: '10px 20px', borderRadius: '5px' }}><h1>Loading...</h1></div>
-</div>})
+     </div> 
+     
+     :        
+     
+     <div style={styles.loading}>
+          <h1>Loading...</h1>
+      </div>
+      
+    })
      
         
     </div>

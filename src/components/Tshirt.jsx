@@ -8,17 +8,19 @@ import {
   useTexture
 } from '@react-three/drei';
 import share from '../assets/share.png';
-import arms from '../assets/arms.png';
+import stripeimage from '../assets/arms.png';
 import open from '../assets/open.png';
 import closeimage from '../assets/close.png';
-import body from '../assets/body.png';
-import neck from '../assets/neck.png';
+import meshs from '../assets/body.png';
+import souls from '../assets/neck.png';
 import icon from '../assets/image.png';
 import text from '../assets/text.png';
 import { degToRad } from "three/src/math/MathUtils.js";
 import { TextureLoader } from 'three/src/loaders/TextureLoader'
 import {isMobile} from 'react-device-detect';
 import AddTextureModal from './Text';
+import * as utils from './utils.jsx';
+import * as styles from './style.jsx';
 
 export function TshirtMesh({ onModelLoad, ...props }) {
   const { nodes, materials,scene } = useGLTF("/models/Tshirt.glb");
@@ -31,8 +33,7 @@ export function TshirtMesh({ onModelLoad, ...props }) {
 
   return (
     <group {...props} dispose={null} position={isMobile?[0, -2.5, 0]:[0, -4, 0]}  scale={isMobile?2:3}>
-      <mesh   material-metalness={0.5}
-           material-roughness={0.5} geometry={nodes.tshirt5Pattern2D_2210268.geometry} material={materials['Fabric']} position={[0, 0.001, 0]} material-color={props.customColors.mesh} >
+      <mesh geometry={nodes.tshirt5Pattern2D_2210268.geometry} material={materials.Fabric3} position={[0, 0.001, 0]} material-color={props.customColors.mesh}>
       <Decal
               // debug // Makes "bounding box" of the decal visible
               position={props.customColors.pos} // Position of the decal
@@ -50,105 +51,46 @@ export function TshirtMesh({ onModelLoad, ...props }) {
 
 
             </Decal> 
-      </mesh>
-      <mesh   material-metalness={0.5} material-roughness={0.5} geometry={nodes.tshirt5Pattern2D_2210268001.geometry} material={materials['Fabric1']} position={[0, 0.001, 0]} material-color={props.customColors.arm}></mesh>
-      <mesh   material-metalness={0.5} material-roughness={0.5} geometry={nodes.tshirt5Pattern2D_2210268002.geometry} material={materials['Fabric2']} position={[0, 0.001, 0]} material-color={props.customColors.arm}></mesh>
-      <mesh   material-metalness={0.5} material-roughness={0.5} geometry={nodes.tshirt5Pattern2D_2210268003.geometry} material={materials['Fabric3']} position={[0, 0.001, 0]} material-color={props.customColors.neck}></mesh>
+            </mesh>
+      <mesh geometry={nodes.tshirt5Pattern2D_2210268001.geometry} material={materials.Material} position={[0, 0.001, 0]} material-color={props.customColors.arm}/>
+      <mesh geometry={nodes.tshirt5Pattern2D_2210268002.geometry} material={materials.Material} position={[0, 0.001, 0]} material-color={props.customColors.arm}/>
+      <mesh geometry={nodes.tshirt5Pattern2D_2210268003.geometry} material={materials['Material.001']} position={[0, 0.001, 0]} material-color={props.customColors.neck}/>
+      <mesh geometry={nodes.tshirt5Pattern2D_2210268004.geometry} material={materials.Fabric3} position={[0, 0.001, 0]} material-color={props.customColors.mesh}/>
     </group>
   );
 }
 
 function Tshirt() {
   const [meshColor, setMeshColor] = useState('#ffffff');
-  const [armColor, setArmColor] = useState('#ffffff');
-  const [neckColor, setNeckColor] = useState('#ffffff');
+  const [stripeColor, setStripeColor] = useState('#ffffff');
+  const [soulColor, setSoulColor] = useState('#ffffff');
   const [display, setDisplay] = useState('none');
   const [texture, setTexture] = useState("./textures/wawa.png");
   const [position, setPosition] = useState([0, 1.4, 0]);
   const [rotation, setRotation] = useState([0, 0, 0]);
   const [scale, setScale] = useState([0.3, 0.3, 0.3]);
-  const partSelected = ['mesh', 'arm', 'neck'];
+  const partSelected = ['mesh', 'stripes', 'soul'];
   const [selectedIndex, setSelectedIndex] = useState(0);
   const [modelLoaded, setModelLoaded] = useState(false);
   const [close, setClose] = useState(true);
   const canvasRef = useRef(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
-
-  const handleAddTexture = () => {
-    setIsModalOpen(true);
-  };
-
-  const handleModalClose = () => {
-    setIsModalOpen(false);
-  };
+  const [display2, setDisplay2] = useState('none');
 
   const handleOkModal = (generatedTexture) => {
     setScale([1,1,1]);
     setDisplay("flex");
-    handleModalClose();
+    setClose(true);
     setTexture(generatedTexture);
   };
 
-  const getBackgroundSize = (value, min, max) => {
-    return { backgroundSize: `${((value - min) * 100) / (max - min)}% 100%` };
-  };
-
-
-  const handleModelLoad = () => {
-    setModelLoaded(true);
-    console.log(modelLoaded);
-  };
-
-  const handlePartChange = (index) => {
-    setSelectedIndex(index);
-  };
-
-  const handleClose = () => {
-    if(close==true){
-      setDisplay("none");
-      setClose(false);
-    }else{
-      setDisplay("flex");
-      setClose(true);
-    }
-  };
-
-  const handleColorChange = (color) => {
-    switch (partSelected[selectedIndex]) {
-      case 'mesh':
-        setMeshColor(color);
-        break;
-      case 'arm':
-        setArmColor(color);
-        break;
-      case 'neck':
-        setNeckColor(color);
-        break;
-      default:
-        break;
-    }
-  };
-
-  const galleryOpen = () => {
-    const input = document.createElement('input');
-    input.type = 'file';
-    input.accept = 'image/*';
-    input.onchange = (event) => {
-      const file = event.target.files[0];
-      const reader = new FileReader();
-      reader.onload = () => {
-        if(texture!==reader.result){
-          setDisplay("flex");
-        }
-        setTexture(reader.result);
-      };
-      reader.readAsDataURL(file);
-    };
-    input.click();
-  };
-
-  const handleSliderChange = (setter) => (event) => {
-    setter(parseFloat(event.target.value));
+  const lock = {
+    display: display2,
+    position: 'absolute',
+    top: '35%',
+    left: '5%' ,
+    width:'50px',
+    height:'50px'
   };
 
   const BUTTON_HEIGHT = 20;
@@ -186,16 +128,7 @@ function Tshirt() {
   dropdownStyle.gap = dynamicGap + 'px';
   dropdownStyle2.gap = dynamicGap + 'px';
 
-  const saveCanvasAsImage = () => {
-    const canvas = canvasRef.current;
-    if (canvas) {
-      const dataURL = canvas.toDataURL();
-      const link = document.createElement('a');
-      link.href = dataURL;
-      link.download = 'canvas_image.png';
-      link.click();
-    }
-  };
+
   return (
     <div style={{overflow:"hidden", width: '100vw', height: '100vh', position: 'relative',backgroundColor:'black' }}>
       <Canvas gl={{ preserveDrawingBuffer: true }}  ref={canvasRef} shadows camera={{ position: [3, 3, 3], fov: 30 }}>
@@ -204,11 +137,11 @@ function Tshirt() {
         <Environment preset="sunset" background blur={4} />
         <ambientLight />
         <TshirtMesh
-        onModelLoad={handleModelLoad}
+        onModelLoad={() => utils.handleModelLoad(setModelLoaded)}
           customColors={{
             mesh: meshColor,
-            arm: armColor,
-            neck: neckColor,
+            arm: stripeColor,
+            neck: soulColor,
             texture: texture,
             pos: position,
             rotation: rotation,
@@ -216,104 +149,80 @@ function Tshirt() {
           }}
         />
       </Canvas>
-      ({modelLoaded ? <div>
-        ({isMobile ? <div>
-        <input
-          type="color"
-          style={{ position: 'absolute',top: '10%',left: '20px', width: '50px', height: '50px'}}
-          value={partSelected[selectedIndex] === 'mesh' ? meshColor : partSelected[selectedIndex] === 'arm' ? armColor : neckColor}
-          onChange={(e) => handleColorChange(e.target.value)}
-        />
-        <div style={dropdownStyle2}>
-        {partSelected.map((part, index) => (
+      ({modelLoaded ? 
+         <div>
+          ({isMobile ? 
+          
+          <div>
+                  <input
+                    type="color"
+                    style={styles.colorPickerStyle}
+                    value={partSelected[selectedIndex] === 'mesh' ? meshColor : partSelected[selectedIndex] === 'stripes' ? stripeColor : soulColor}
+                    onChange={(e) => utils.handleColorChange(e.target.value,setMeshColor,selectedIndex,partSelected,setStripeColor,setSoulColor)}
+                  />
+                  <div style={dropdownStyle2}>
+                  {partSelected.map((part, index) => (
                     <button 
-                    style={{ 
-                      borderRadius: 360,
-                      border:0,
-                      width: '60px', 
-                      height: '60px',
-                      backgroundColor: part === partSelected[selectedIndex] ? "green" : "transparent" // Apply green border if selected, otherwise no border
-                    }} 
-                    key={index} 
-                    onClick={() => handlePartChange(index)}
-                  >
-              <img src={part === 'mesh' ? body : part === 'arm' ? arms : neck} alt={part} style={{ width: '100%', height: '100%' }} />
-          </button>
-        ))}
-        </div>
-      </div>: <div
+                      style={{ 
+                        borderRadius: 360,
+                        border:0,
+                        width: '60px', 
+                        height: '60px',
+                        backgroundColor: part === partSelected[selectedIndex] ? "green" : "transparent" 
+                      }} 
+                      key={index} 
+                      onClick={() => utils.handlePartChange(index,setDisplay,setClose,texture,setDisplay2,undefined,setSelectedIndex)}
+                    >
+              <img src={part === 'mesh' ? meshs : part === 'stripes' ? stripeimage : souls} alt={part} style={{width: '100%', height: '100%' }} />
+            </button>
+          ))}
+          </div>
+      </div>
+      : 
+      
+      <div
         style={dropdownStyle}
       >
         <input
-          type="color"
-          style={{ width:  '100px', height:  '100px'}}
-          value={partSelected[selectedIndex] === 'mesh' ? meshColor : partSelected[selectedIndex] === 'arm' ? armColor : neckColor}
-          onChange={(e) => handleColorChange(e.target.value)}
+              type="color"
+              style={{ width:  '100px', height:  '100px'}}
+              value={partSelected[selectedIndex] === 'mesh' ? meshColor : partSelected[selectedIndex] === 'stripes' ? stripeColor : soulColor}
+              onChange={(e) => utils.handleColorChange(e.target.value,setMeshColor,selectedIndex,partSelected,setStripeColor,setSoulColor)}
         />
-        {partSelected.map((part, index) => (
-          <button style={{ backgroundColor: part === partSelected[selectedIndex] ? "green" :"white",border:0, borderRadius:360, display: 'flex', justifyContent: 'center', alignItems: 'center' }} key={index} onClick={() => handlePartChange(index)}>
-            <img src={part === 'mesh' ? body : part === 'arm' ? arms : neck} alt={part} style={{ maxWidth: '80px', maxHeight: '80px' }} />
-          </button>
-        ))}
-      </div> })
-      <div
-        style={{
-          position: 'absolute',
-          top: '10%',
-          right: '5%',
-        }}
-      >
-<button 
-  style={{ 
-    backgroundColor: "white",
-    borderRadius: 360,
-    width: !isMobile ? '100px' : '60px', 
-    height: !isMobile ? '100px' : '60px',
-    display: "flex",
-    justifyContent: "center",
-    alignItems: "center"
-  }}  
-  onClick={galleryOpen}
->
-  <img 
-    src={icon} 
-    alt="gallery" 
-    style={{ 
-      width: !isMobile ? '50px' : '35px', 
-      height: !isMobile ? '50px' : '35px'
-    }} 
-  />
-</button>
+            {partSelected.map((part, index) => (
+              <button style={{ backgroundColor: part === partSelected[selectedIndex] ? "green" :"white",border:0, borderRadius:360, display: 'flex', justifyContent: 'center', alignItems: 'center' }} key={index} onClick={() => utils.handlePartChange(index,setDisplay,setClose,texture,undefined,undefined,setSelectedIndex)}>
+                <img src={part === 'mesh' ? body : part === 'neck' ? arms : neck} alt={part} style={{ width: '80px', height: '80px' }} />
+              </button>
+            ))}
+          </div> 
+            
+        })
+       {/* Gallery Button */}
+       <div style={styles.gallery}>
+            <button style={styles.galleryButtonStyle}  
+              onClick={()=>utils.galleryOpen(setDisplay,setClose,setDisplay2,setTexture)}
+            > <img src={icon} alt="gallery" style={styles.galleryButtonImageStyle} /></button>
       </div>
-      <div style={{ backgroundColor:"white", borderRadius:360, position: 'absolute', bottom: '20%', right: '5%', }}>
-      <button 
-  style={{ 
-    display: "flex",
-    justifyContent: "center",
-    alignItems: "center",
-    alignContent: "center",
-    borderRadius: 360,
-    width: !isMobile ? '100px' : '60px', 
-    height: !isMobile ? '100px' : '60px'
-  }} 
-  onClick={saveCanvasAsImage}
->
-  <img 
-    src={share} 
-    alt="gallery" 
-    style={{ 
-      width: !isMobile ? '50px' : '35px', 
-      height: !isMobile ? '50px' : '35px'
-    }} 
-  />
-</button>
-      </div>
-      <div style={{backgroundColor:"white", borderRadius:360,position: 'absolute',top: '25%',right: '5%' ,    width: !isMobile ? '100px' : '60px', height: !isMobile ? '100px' : '60px'}}> <button onClick={handleAddTexture}><img src={text}></img></button> </div> 
 
-{isModalOpen && (
-  <AddTextureModal onClose={handleModalClose} onOk={handleOkModal} />
-)}
-      ({isMobile && texture!="./textures/wawa.png"  && <div style={{position: 'absolute',top: '35%',left: '5%' ,width:'50px',height:'50px'}}> <button onClick={handleClose}><img src={close ? closeimage:open }></img></button> </div> })
+      {/* Save Button */}
+      <div style={styles.save}>
+          <button style={styles.saveButtonStyle} onClick={() => utils.saveCanvasAsImage(canvasRef)}>
+            <img src={share} alt="gallery" style={styles.saveButtonImages} 
+          />
+          </button>
+      </div>
+
+      {/* Add Text Button */}
+      <div style={styles.addTextButtonStyle}> <button onClick={() => utils.handleAddTexture(setIsModalOpen)}><img src={text}></img></button> </div> 
+
+      {isModalOpen && (
+        <AddTextureModal onClose={() => utils.handleModalClose(setIsModalOpen)} onOk={handleOkModal} />
+      )}
+
+       {/* Add Lock */}
+       ({isMobile && texture!="./textures/wawa.png" && 
+              <div style={lock}> <button onClick={()=>utils.handleClose(close,setClose,setDisplay)}><img src={close ? closeimage:open }></img></button> 
+       </div> })
       <div style={{display:display,     position: 'absolute',      top: isMobile? '40%':'90%',
           left: '10%', flexDirection: isMobile?'column':'row',gap: isMobile?'5px':'150px'}}>
             <div>
@@ -325,10 +234,10 @@ function Tshirt() {
                 max={3}
                 step={0.01}
                 value={position[0]}
-                onChange={handleSliderChange((value) =>
+                onChange={utils.handleSliderChange((value) =>
                   setPosition((prev) => [value, prev[1], prev[2]])
                 )}
-                style={getBackgroundSize(position[0],-3,3)}
+                style={utils.getBackgroundSize(position[0],-3,3)}
               />
             </div>
             <div>
@@ -340,10 +249,10 @@ function Tshirt() {
                 max={3}
                 step={0.01}
                 value={position[1]}
-                onChange={handleSliderChange((value) =>
+                onChange={utils.handleSliderChange((value) =>
                   setPosition((prev) => [prev[0], value, prev[2]])
                 )}
-                style={getBackgroundSize(position[1],0,3)}
+                style={utils.getBackgroundSize(position[1],0,3)}
               />
             </div>
             <div>
@@ -355,10 +264,10 @@ function Tshirt() {
                 max={Math.PI}
                 step={degToRad(1)}
                 value={rotation[1]}
-                onChange={handleSliderChange((value) =>
+                onChange={utils.handleSliderChange((value) =>
                   setRotation((prev) => [prev[0], value, prev[2]])
                 )}
-                style={getBackgroundSize(rotation[1],-Math.PI,Math.PI)}
+                style={utils.getBackgroundSize(rotation[1],-Math.PI,Math.PI)}
               />
             </div>
             <div>
@@ -370,10 +279,10 @@ function Tshirt() {
                 max={5}
                 step={0.01}
                 value={scale[0]}
-                onChange={handleSliderChange((value) =>
+                onChange={utils.handleSliderChange((value) =>
                   setScale([value, value, value])
                 )}
-                style={getBackgroundSize(scale[0],0,5)}
+                style={utils.getBackgroundSize(scale[0],0,5)}
               />
             </div>
         </div>
